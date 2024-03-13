@@ -1,45 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+
     <item
         android:id="@+id/logInMenu"
-        android:title="Log in"
+        android:title="Log out"
         android:orderInCategory="100"/>
 
     <item
-        android:id="@+id/galleryMenu"
-        android:title="Gallery"
+        android:id="@+id/bookMenu"
+        android:title="Book lists"
         android:orderInCategory="200"/>
 
     <item
-        android:id="@+id/cameraMenu"
-        android:title="Camera"
+        android:id="@+id/toolsMenu"
+        android:title="Tools"
         android:orderInCategory="300"/>
 
-    <item
-        android:id="@+id/FBStorageMenu"
-        android:title="FB Storage"
-        android:orderInCategory="400"/>
-
-    <item
-        android:id="@+id/notificationMenu"
-        android:title="Notification+AlarmManager"
-        android:orderInCategory="500"/>
-
-    <item
-        android:id="@+id/chatMenu"
-        android:title="Chat"
-        android:orderInCategory="600"/>
-
-    <item
-        android:id="@+id/googleMapsMenu"
-        android:title="GoogleMaps"
-        android:orderInCategory="700"/>
-
-    <item
-        android:id="@+id/sharedPreferencesMenu"
-        android:title="Shared Preferences"
-        android:orderInCategory="800"/>
 
 
 </menu>

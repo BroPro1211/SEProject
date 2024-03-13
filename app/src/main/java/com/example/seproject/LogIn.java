@@ -3,7 +3,9 @@ package com.example.seproject;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -18,14 +20,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
-public class LogIn extends BaseActivity {
+public class LogIn extends AppCompatActivity {
     private EditText emailET;
     private EditText passwordET;
-
+    private SharedPreferences sharedPref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
+
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
 
         emailET = findViewById(R.id.emailEditText);
         passwordET = findViewById(R.id.passwordEditText);
@@ -34,6 +38,7 @@ public class LogIn extends BaseActivity {
     public void signUp(View view){
         Intent i = new Intent(this, SignUp.class);
         startActivity(i);
+        finish();
     }
 
     public void logIn(View view){
@@ -52,11 +57,16 @@ public class LogIn extends BaseActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            FirebaseUser user = FBref.FBAuth.getCurrentUser();
+                            // FirebaseUser user = FBref.FBAuth.getCurrentUser();
 
-                            Intent intent = new Intent(getBaseContext(), LoggedIn.class);
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putBoolean("loggedIn", true);
+                            editor.apply();
+
+                            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                            /*Intent intent = new Intent(getBaseContext(), LoggedIn.class);
                             intent.putExtra("username", email);
-                            intent.putExtra("password", password);
+                            intent.putExtra("password", password);*/
                             startActivity(intent);
                         }
                         else {
