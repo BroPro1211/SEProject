@@ -10,7 +10,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.seproject.FBref;
+import com.example.seproject.data_classes.FBref;
 import com.example.seproject.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

@@ -1,9 +1,9 @@
-package com.example.seproject;
+package com.example.seproject.data_classes;
 
 import android.util.Log;
 
-import com.example.seproject.book_lists.BookList;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.Exclude;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,6 +18,9 @@ public class User {
     private static List<BookList> orderedBookLists;
     // an ordering of the signed in user's book lists for the recycler view and delete list dialog
 
+    private static List<Book> currentlyViewedListOfBooks;
+    // an ordering of the current list of books that is being viewed, for the book list overview page
+    // and book search page
 
     public User(String uid, String username){
         if (uid == null || username == null || uid.length() == 0 || username.length() == 0)
@@ -26,7 +29,7 @@ public class User {
         this.uid = uid;
         this.username = username;
         // LinkedHashMap is a Map implementation that preserves the insertion order when adding and removing entries
-        this.bookLists = new LinkedHashMap<>();
+        bookLists = new LinkedHashMap<>();
 
         // adds the default book lists
         addBookList("Reading", "Books I'm reading");
@@ -67,6 +70,11 @@ public class User {
 
     }
 
+    @Exclude
+    public int getBookListCount(){
+        return bookLists.size();
+    }
+
     public static void setCurrentUser(User user){
         loggedInUser = user;
     }
@@ -82,6 +90,13 @@ public class User {
         setCurrentUser(null);
     }
 
+    public static void setCurrentlyViewedListOfBooks(List<Book> listOfBooks){
+        currentlyViewedListOfBooks = listOfBooks;
+    }
+    public static List<Book> getCurrentlyViewedListOfBooks(){
+        return currentlyViewedListOfBooks;
+    }
+
 
     public static void createOrderedBookLists(){
         orderedBookLists = User.getCurrentUser().bookLists.entrySet()
@@ -95,9 +110,9 @@ public class User {
         return orderedBookLists;
     }
 
+
     // FB required constructor and getters
     public User(){}
-
     public String getUid(){
         return uid;
     }

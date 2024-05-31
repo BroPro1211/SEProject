@@ -1,14 +1,16 @@
-package com.example.seproject.book_lists;
+package com.example.seproject.book_lists.recycler_adapters;
 
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public abstract class ListRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
-    public final List<T> data;
+public abstract class ListRecyclerAdapter<U extends RecyclerView.ViewHolder, T> extends RecyclerView.Adapter<U>{
+    protected final List<T> data;
+    protected final Fragment fragment;
 
     public static abstract class ClickableViewHolder extends RecyclerView.ViewHolder{
 
@@ -22,8 +24,9 @@ public abstract class ListRecyclerAdapter<T> extends RecyclerView.Adapter<Recycl
     }
 
 
-    public ListRecyclerAdapter(List<T> data){
+    public ListRecyclerAdapter(List<T> data, Fragment fragment){
         this.data = data;
+        this.fragment = fragment;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.example.seproject.book_lists;
+package com.example.seproject.book_lists.dialog_fragments;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -14,14 +14,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.seproject.R;
-import com.example.seproject.User;
+import com.example.seproject.book_lists.ListFragmentAddDelete;
+import com.example.seproject.data_classes.User;
 
 public class AddBookListDialogFragment extends DialogFragment {
 
-    // parent fragment needs to notify the adapter
-    public interface onReturnFromAddDialog{
-        void listAdded();
-    }
 
     @NonNull
     @Override
@@ -47,7 +44,7 @@ public class AddBookListDialogFragment extends DialogFragment {
                             String description = listDescriptionET.getText().toString();
                             User.getCurrentUser().addBookList(name, description);
 
-                            ((onReturnFromAddDialog)getParentFragment()).listAdded();
+                            ((ListFragmentAddDelete)getParentFragment()).notifyAdapterItemInserted(-1);
                         }
                     }
                 })

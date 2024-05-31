@@ -1,4 +1,4 @@
-package com.example.seproject;
+package com.example.seproject.tools;
 
 import android.app.NotificationManager;
 import android.content.Context;
@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.seproject.R;
 
 import java.util.Locale;
 import java.util.concurrent.Executors;

@@ -39,6 +39,21 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/listDescriptionTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="5dp"
+                android:maxLines="3"
+
+                android:text="Book list description"
+                android:textColor="@color/dark_gray_text"
+                android:textSize="18sp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/listNameTV" />
 
             <ImageButton
                 android:id="@+id/addToListButton"
@@ -52,7 +67,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
 
                 app:layout_constraintEnd_toStartOf="@+id/deleteFromListButton"
-                app:layout_constraintTop_toBottomOf="@+id/listNameTV" />
+                app:layout_constraintTop_toBottomOf="@+id/listDescriptionTV" />
 
 
             <ImageButton
@@ -65,21 +80,8 @@
                 android:src="@drawable/baseline_delete_40"
 
                 app:layout_constraintBottom_toBottomOf="@+id/addToListButton"
-                app:layout_constraintEnd_toStartOf="@id/listInfoButton"
-                app:layout_constraintTop_toTopOf="@+id/addToListButton" />
-
-            <ImageButton
-                android:id="@+id/listInfoButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-
-                android:backgroundTint="@color/dark_gray_button"
-                android:src="@drawable/outline_info_40"
-
-                app:layout_constraintBottom_toBottomOf="@+id/deleteFromListButton"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/deleteFromListButton" />
+                app:layout_constraintTop_toTopOf="@+id/addToListButton" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

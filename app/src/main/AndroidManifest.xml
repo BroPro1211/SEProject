@@ -25,12 +25,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".VerifyEmail"
-            android:exported="false" />
-        <activity
-            android:name=".BooksAPI"
-            android:exported="false" />
-        <activity
             android:name=".alpha.ChatAct"
             android:exported="false" />
         <activity
@@ -56,6 +50,7 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false">
 
         </activity>

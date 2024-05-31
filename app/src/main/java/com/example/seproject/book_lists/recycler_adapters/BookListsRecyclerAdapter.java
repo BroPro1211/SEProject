@@ -1,6 +1,7 @@
-package com.example.seproject.book_lists;
+package com.example.seproject.book_lists.recycler_adapters;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,19 +10,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.seproject.MainActivity;
 import com.example.seproject.R;
+import com.example.seproject.data_classes.BookList;
+import com.example.seproject.book_lists.BookListOverviewFragment;
 
 import java.util.List;
 
-public class BookListRecyclerAdapter extends RecyclerView.Adapter<BookListRecyclerAdapter.BookListViewHolder> {
+public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyclerAdapter.BookListViewHolder, BookList> {
 
-    private List<BookList> bookLists;
-    private Fragment fragment;
-
-    public static class BookListViewHolder extends RecyclerView.ViewHolder {
+    public static class BookListViewHolder extends ListRecyclerAdapter.ClickableViewHolder {
         private TextView nameTV;
         private TextView listSizeTV;
 
@@ -30,16 +29,20 @@ public class BookListRecyclerAdapter extends RecyclerView.Adapter<BookListRecycl
 
             nameTV = itemView.findViewById(R.id.listNameTV);
             listSizeTV = itemView.findViewById(R.id.listSizeTV);
+        }
 
-            itemView.setOnClickListener(new View.OnClickListener() {
+        public View.OnClickListener getOnClickListener(){
+            return new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    BookListRecyclerAdapter adapter = (BookListRecyclerAdapter)getBindingAdapter();
+                    BookListsRecyclerAdapter adapter = (BookListsRecyclerAdapter)getBindingAdapter();
 
                     int position = getAbsoluteAdapterPosition();
-                    String listID = adapter.bookLists.get(position).getListID();
+                    String listID = adapter.data.get(position).getListID();
                     Bundle args = new Bundle();
                     args.putString(BookListOverviewFragment.ARG_LIST_ID, listID);
+
+                    Log.d("SEProject", "Opening list id " + listID + " overview");
 
                     FragmentManager fragmentManager = adapter.fragment.getParentFragmentManager();
                     fragmentManager.beginTransaction()
@@ -47,12 +50,8 @@ public class BookListRecyclerAdapter extends RecyclerView.Adapter<BookListRecycl
                             .setReorderingAllowed(true)
                             .addToBackStack(MainActivity.HOME_SCREEN_TAG)
                             .commit();
-
-
                 }
-
-            });
-
+            };
         }
 
         public TextView getNameTV() {
@@ -64,30 +63,24 @@ public class BookListRecyclerAdapter extends RecyclerView.Adapter<BookListRecycl
     }
 
 
-    public BookListRecyclerAdapter(List<BookList> bookLists, Fragment parentFragment){
-        this.bookLists = bookLists;
-        fragment = parentFragment;
+    public BookListsRecyclerAdapter(List<BookList> bookLists, Fragment parentFragment){
+        super(bookLists, parentFragment);
     }
 
     @NonNull
     @Override
     public BookListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.book_list_recycler_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.booklist_recycler_layout, parent, false);
         return new BookListViewHolder(view);
 
     }
 
     @Override
     public void onBindViewHolder(@NonNull BookListViewHolder holder, int position) {
-        BookList bookList = bookLists.get(position);
+        BookList bookList = data.get(position);
         holder.getNameTV().setText(bookList.getName());
         holder.getListSizeTV().setText(bookList.getBookCount() + " books");
 
-    }
-
-    @Override
-    public int getItemCount() {
-        return bookLists.size();
     }
 
 

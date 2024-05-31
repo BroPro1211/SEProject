@@ -28,7 +28,6 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.example.seproject.R;
-import com.example.seproject.ReadingModeFragment;
 
 import java.util.Calendar;
 

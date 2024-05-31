@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/addBookLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".book_lists.AddBookFragment">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="16dp"
+        android:id="@+id/listCardView"
+        app:cardElevation="10dp"
+        app:cardCornerRadius="10dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/textView20"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="5dp"
+
+                android:text="At least one search parameter must be filled"
+                android:textColor="@color/dark_gray_text"
+                android:textSize="16sp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <EditText
+                android:id="@+id/searchTitleET"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginHorizontal="10dp"
+
+                android:background="@color/light_gray"
+                android:drawableLeft="@drawable/baseline_book_24"
+                android:drawablePadding="10dp"
+                android:hint="Book title"
+
+                android:inputType="textEmailAddress"
+                android:padding="5dp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView20" />
+
+            <EditText
+                android:id="@+id/searchAuthorET"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginHorizontal="10dp"
+
+                android:background="@color/light_gray"
+                android:drawableLeft="@drawable/baseline_person_24"
+                android:drawablePadding="10dp"
+                android:hint="Book author"
+
+                android:inputType="textEmailAddress"
+                android:padding="5dp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/searchTitleET" />
+
+            <Button
+                android:id="@+id/searchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+
+                android:text="Search"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+
+                android:backgroundTint="@color/dark_gray_button"
+                app:layout_constraintTop_toBottomOf="@+id/searchAuthorET"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+            <ProgressBar
+                android:visibility="invisible"
+                android:id="@+id/searchProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/searchButton"
+                app:layout_constraintEnd_toEndOf="@+id/searchButton"
+                app:layout_constraintStart_toStartOf="@+id/searchButton"
+                app:layout_constraintTop_toTopOf="@+id/searchButton" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <include
+        layout="@layout/recycler_list_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/listCardView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

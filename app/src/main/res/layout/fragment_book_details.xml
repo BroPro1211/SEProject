@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context=".book_lists.BookDetailsFragment"
+    android:background="@color/white"
+    >
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="20dp"
+
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/titleTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:maxLines="4"
+                android:scrollbars="vertical"
+
+                android:text="Harry Potter and the Sorcerer's Stone\nNew line"
+
+                android:textColor="@color/black"
+                android:textSize="25sp"
+
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="2dp"
+                app:layout_constraintEnd_toStartOf="@+id/bookImageView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/authorTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:maxLines="2"
+                android:scrollbars = "vertical"
+
+                android:text="JK Rowling\nNew line"
+
+                android:textColor="@color/dark_gray_text"
+                android:textSize="20sp"
+
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginTop="5dp"
+                app:layout_constraintEnd_toStartOf="@+id/bookImageView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/titleTV" />
+
+
+            <ImageView
+                android:id="@+id/bookImageView"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/demobookimage"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="invisible"/>
+
+            <ProgressBar
+                android:id="@+id/bookProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/bookImageView"
+                app:layout_constraintEnd_toEndOf="@id/bookImageView"
+                app:layout_constraintStart_toStartOf="@+id/bookImageView"
+                app:layout_constraintTop_toTopOf="@+id/bookImageView" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:text="Description"
+                android:textSize="18sp"
+                android:textColor="@color/light_gray_text"
+
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/descriptionTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="2dp"
+
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat"
+                android:textColor="@color/dark_gray_text"
+                android:textSize="18sp"
+                android:background="@color/light_gray"
+
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:text="Genre"
+                android:textSize="18sp"
+                android:textColor="@color/light_gray_text"
+
+                android:layout_marginTop="5dp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/descriptionTV"
+                />
+            <TextView
+                android:id="@+id/genreTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="2dp"
+
+                android:text="Young adult"
+                android:textColor="@color/dark_gray_text"
+                android:textSize="18sp"
+                android:background="@color/light_gray"
+
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:text="Page Count"
+                android:textSize="18sp"
+                android:textColor="@color/light_gray_text"
+
+                android:layout_marginTop="5dp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/genreTV"
+                />
+            <TextView
+                android:id="@+id/pageCountTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="2dp"
+
+                android:text="257"
+                android:textColor="@color/dark_gray_text"
+                android:textSize="18sp"
+                android:background="@color/light_gray"
+
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:text="Reviews"
+                android:textSize="18sp"
+                android:textColor="@color/light_gray_text"
+
+                android:layout_marginTop="5dp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/pageCountTV"
+                />
+            <TextView
+                android:id="@+id/reviews"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="2dp"
+
+                android:text="257"
+                android:textColor="@color/dark_gray_text"
+                android:textSize="18sp"
+                android:background="@color/light_gray"
+
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/reviews"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addBookFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"
+        android:src="@drawable/baseline_white_add_24"
+        app:tint="@android:color/white"
+        android:visibility="gone"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

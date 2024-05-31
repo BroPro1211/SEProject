@@ -1,4 +1,4 @@
-package com.example.seproject.book_lists;
+package com.example.seproject.book_lists.dialog_fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,7 +11,9 @@ import androidx.fragment.app.DialogFragment;
 
 import android.widget.Toast;
 
-import com.example.seproject.User;
+import com.example.seproject.book_lists.ListFragmentAddDelete;
+import com.example.seproject.data_classes.BookList;
+import com.example.seproject.data_classes.User;
 
 import java.util.List;
 
@@ -51,7 +53,7 @@ public class DeleteBookListDialogFragment extends DialogFragment implements Dial
                 Toast.makeText(getContext(), "Select list to delete", Toast.LENGTH_LONG).show();
             else {
                 User.getCurrentUser().deleteBookList(bookLists.get(deletedList).getListID(), deletedList);
-                ((DeleteBookListDialogFragment.onReturnFromDeleteDialog)getParentFragment()).listDeleted(deletedList);
+                ((ListFragmentAddDelete)getParentFragment()).notifyAdapterItemRemoved(deletedList);
             }
         }
         else

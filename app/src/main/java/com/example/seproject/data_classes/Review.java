@@ -1,4 +1,4 @@
-package com.example.seproject;
+package com.example.seproject.data_classes;
 
 public class Review {
     public String uid;
