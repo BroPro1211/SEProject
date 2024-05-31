@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
     <application
         android:allowBackup="true"
@@ -12,10 +13,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+        android:theme="@style/Theme.SEProject"
         tools:targetApi="31">
         <activity
-            android:name=".LaunchActivity"
+            android:name=".LoadingLauncher"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,34 +25,42 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ChatAct"
+            android:name=".VerifyEmail"
             android:exported="false" />
         <activity
-            android:name=".FBDatabaseAct"
+            android:name=".BooksAPI"
+            android:exported="false" />
+        <activity
+            android:name=".alpha.ChatAct"
+            android:exported="false" />
+        <activity
+            android:name=".alpha.FBDatabaseAct"
             android:exported="false" />
 
         <receiver
-            android:name=".NotificationReceiver"
+            android:name=".alpha.NotificationReceiver"
             android:enabled="true"
             android:exported="true" />
-
+        <receiver
+            android:name=".tools.ReadingRemindersReceiver"
+            android:enabled="true"
+            android:exported="true" />
         <activity
-            android:name=".NotificationsAct"
+            android:name=".alpha.NotificationsAct"
             android:exported="false" />
         <activity
-            android:name=".GalleryAct"
+            android:name=".alpha.GalleryAct"
             android:exported="false" />
         <activity
-            android:name=".CameraAct"
+            android:name=".alpha.CameraAct"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false">
+
+        </activity>
         <activity
-            android:name=".SharedPreferencesAct"
-            android:exported="false" />
-        <activity
-            android:name=".LoggedIn"
+            android:name=".alpha.SharedPreferencesAct"
             android:exported="false" />
         <activity
             android:name=".SignUp"

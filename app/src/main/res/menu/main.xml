@@ -3,19 +3,19 @@
 
 
     <item
-        android:id="@+id/logInMenu"
-        android:title="Log out"
-        android:orderInCategory="100"/>
-
-    <item
-        android:id="@+id/bookMenu"
-        android:title="Book lists"
-        android:orderInCategory="200"/>
-
-    <item
         android:id="@+id/toolsMenu"
         android:title="Tools"
-        android:orderInCategory="300"/>
+        android:icon="@drawable/baseline_hardware_24"/>
+
+    <item
+        android:id="@+id/booksMenu"
+        android:title="Book lists"
+        android:icon="@drawable/baseline_library_books_24"/>
+
+    <item
+        android:id="@+id/profileMenu"
+        android:title="Profile"
+        android:icon="@drawable/baseline_person_24"/>
 
 
 
