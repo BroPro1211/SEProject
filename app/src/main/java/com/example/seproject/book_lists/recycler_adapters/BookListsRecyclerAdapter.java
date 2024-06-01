@@ -18,7 +18,9 @@ import com.example.seproject.book_lists.BookListOverviewFragment;
 
 import java.util.List;
 
-public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyclerAdapter.BookListViewHolder, BookList> {
+public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyclerAdapter.BookListViewHolder> {
+
+    private List<BookList> data;
 
     public static class BookListViewHolder extends ListRecyclerAdapter.ClickableViewHolder {
         private TextView nameTV;
@@ -64,7 +66,9 @@ public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyc
 
 
     public BookListsRecyclerAdapter(List<BookList> bookLists, Fragment parentFragment){
-        super(bookLists, parentFragment);
+        super(parentFragment);
+        data = bookLists;
+
     }
 
     @NonNull
@@ -83,5 +87,8 @@ public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyc
 
     }
 
-
+    @Override
+    public int getItemCount() {
+        return data.size();
+    }
 }

@@ -25,9 +25,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".alpha.ChatAct"
-            android:exported="false" />
-        <activity
             android:name=".alpha.FBDatabaseAct"
             android:exported="false" />
 

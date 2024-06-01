@@ -1,5 +1,6 @@
 package com.example.seproject.book_lists.recycler_adapters;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +19,7 @@ import com.example.seproject.data_classes.User;
 import com.example.seproject.data_classes.Book;
 import com.example.seproject.book_lists.BookDetailsFragment;
 
-public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksRecyclerAdapter.BookViewHolder, Book> {
+public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksRecyclerAdapter.BookViewHolder> {
 
     // if adapter accessed from addBookFragment, field stores the listID a book should be added to
     // else is null
@@ -49,7 +50,7 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
                     int position = getAbsoluteAdapterPosition();
 
 
-                    Log.d("SEProject", "Opening book details dialog for position " + position);
+                    Log.d("SEProject", "Opening book details screen for position " + position);
 
                     FragmentManager fragmentManager = adapter.fragment.getParentFragmentManager();
 
@@ -57,6 +58,7 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
                     args.putInt(BookDetailsFragment.ARG_BOOK_POSITION_IN_CURRENTLY_VIEWED_LIST, position);
                     args.putString(BookDetailsFragment.ARG_LIST_ID, adapter.listID);
 
+                    // adds the fragment on top so the search list isn't destroyed
                     fragmentManager.beginTransaction()
                             .add(R.id.fragmentContainerView, BookDetailsFragment.class, args)
                             .setReorderingAllowed(true)
@@ -78,7 +80,7 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
     }
 
     public ListOfBooksRecyclerAdapter(Fragment fragment, String listID) {
-        super(User.getCurrentlyViewedListOfBooks(), fragment);
+        super(fragment);
 
         this.listID = listID;
     }
@@ -92,11 +94,21 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
 
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
-        Book book = data.get(position);
+        Book book = User.getCurrentlyViewedListOfBooks().get(position);
 
         holder.getTitleTV().setText(book.getTitle());
         holder.getAuthorTV().setText(book.getAuthor());
 
-        book.getAndSetImage(fragment.getContext(), holder.getImageView(), holder.getProgressBar());
+        book.getImage(fragment.getContext(), new Book.BookImageReceiver() {
+            @Override
+            public void receiveBookImage(Book book, Bitmap image) {
+                book.setImage(holder.getImageView(), holder.getProgressBar());
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return User.getCurrentlyViewedListOfBooks().size();
     }
 }

@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public abstract class ListRecyclerAdapter<U extends RecyclerView.ViewHolder, T> extends RecyclerView.Adapter<U>{
-    protected final List<T> data;
+public abstract class ListRecyclerAdapter<U extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<U>{
     protected final Fragment fragment;
 
     public static abstract class ClickableViewHolder extends RecyclerView.ViewHolder{
@@ -24,13 +23,8 @@ public abstract class ListRecyclerAdapter<U extends RecyclerView.ViewHolder, T> 
     }
 
 
-    public ListRecyclerAdapter(List<T> data, Fragment fragment){
-        this.data = data;
+    public ListRecyclerAdapter(Fragment fragment){
         this.fragment = fragment;
     }
 
-    @Override
-    public int getItemCount() {
-        return data.size();
-    }
 }

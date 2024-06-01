@@ -53,6 +53,7 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
     private final String CATEGORIES = "categories";
     private final String IMAGE_LINKS = "imageLinks";
     private final String IMAGE = "thumbnail";
+    private final String DATE_PUBLISHED = "publishedDate";
     private final String NUM_RESULTS_FOUND = "totalItems";
     private final String RESULTS_ARRAY = "items";
 
@@ -140,7 +141,6 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
 
         try {
             JSONObject jsonResults = new JSONObject(result);
-            Log.d("sss", jsonResults.toString(3));
 
             int resultCount = jsonResults.getInt(NUM_RESULTS_FOUND);
             if (resultCount == 0){
@@ -187,14 +187,18 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
 
             int pageCount = getJSONProperty(volumeInfo, PAGE_COUNT, 0);
 
+            String datePublished = getJSONProperty(volumeInfo, DATE_PUBLISHED, "");
+
             String imageLink = getJSONProperty(getJSONProperty(volumeInfo, IMAGE_LINKS, null), IMAGE, "");
             final String INSECURE_PREFIX = "http://";
             final String SECURE_PREFIX = "https://";
             if (imageLink.startsWith("http://"))
                 imageLink = SECURE_PREFIX + imageLink.substring(INSECURE_PREFIX.length());
 
-            recyclerBookList.add(new Book(id, title, author, description, genre, pageCount, imageLink));
+            recyclerBookList.add(new Book(id, title, author, description, genre, pageCount, datePublished, imageLink));
             adapter.notifyItemInserted(i);
+
+            Log.d("SEProject", "Added book " + title + ", " + author);
         }
 
         Log.d("SEProject", "Finished creating the recycler list of books");
@@ -249,6 +253,7 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
                         + DESCRIPTION + ","
                         + CATEGORIES + ","
                         + PAGE_COUNT + ","
+                        + DATE_PUBLISHED +","
                         + IMAGE_LINKS
                             + "("
                             + IMAGE

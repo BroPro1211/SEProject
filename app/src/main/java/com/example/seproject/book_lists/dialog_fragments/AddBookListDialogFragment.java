@@ -14,11 +14,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.seproject.R;
+import com.example.seproject.book_lists.BookListsFragment;
 import com.example.seproject.book_lists.ListFragmentAddDelete;
 import com.example.seproject.data_classes.User;
 
 public class AddBookListDialogFragment extends DialogFragment {
-
 
     @NonNull
     @Override
@@ -44,7 +44,7 @@ public class AddBookListDialogFragment extends DialogFragment {
                             String description = listDescriptionET.getText().toString();
                             User.getCurrentUser().addBookList(name, description);
 
-                            ((ListFragmentAddDelete)getParentFragment()).notifyAdapterItemInserted(-1);
+                            ((BookListsFragment)getParentFragment()).notifyAdapterItemInserted(-1);
                         }
                     }
                 })

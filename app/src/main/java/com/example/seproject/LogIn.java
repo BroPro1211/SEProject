@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.seproject.data_classes.BookList;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -124,6 +125,9 @@ public class LogIn extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Log.d("SEProject", "Successfully retrieved user data from FB");
                     User user = task.getResult().getValue(User.class);
+
+                    //for (BookList)
+                    //Log.d()
                     User.setCurrentUser(user);
 
                     enterApplication(context, activity);

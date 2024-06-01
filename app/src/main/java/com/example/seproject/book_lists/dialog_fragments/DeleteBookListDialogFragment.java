@@ -11,6 +11,7 @@ import androidx.fragment.app.DialogFragment;
 
 import android.widget.Toast;
 
+import com.example.seproject.book_lists.BookListsFragment;
 import com.example.seproject.book_lists.ListFragmentAddDelete;
 import com.example.seproject.data_classes.BookList;
 import com.example.seproject.data_classes.User;
@@ -22,10 +23,6 @@ public class DeleteBookListDialogFragment extends DialogFragment implements Dial
     private int deletedList;
     private List<BookList> bookLists;
 
-    // parent fragment needs to notify the adapter
-    public interface onReturnFromDeleteDialog{
-        void listDeleted(int position);
-    }
 
     @NonNull
     @Override
@@ -53,7 +50,7 @@ public class DeleteBookListDialogFragment extends DialogFragment implements Dial
                 Toast.makeText(getContext(), "Select list to delete", Toast.LENGTH_LONG).show();
             else {
                 User.getCurrentUser().deleteBookList(bookLists.get(deletedList).getListID(), deletedList);
-                ((ListFragmentAddDelete)getParentFragment()).notifyAdapterItemRemoved(deletedList);
+                ((BookListsFragment)getParentFragment()).notifyAdapterItemRemoved(deletedList);
             }
         }
         else

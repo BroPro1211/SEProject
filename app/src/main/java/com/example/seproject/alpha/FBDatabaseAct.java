@@ -42,7 +42,8 @@ public class FBDatabaseAct extends MenuActivity {
         }
 
         final String FILE_PATH = "textFiles";
-        StorageReference fileRef = FBref.refStorage.child(FILE_PATH + "/" + title + ".txt");
+        StorageReference fileRef = null;
+        //FBref.FBStorage.child(FILE_PATH + "/" + title + ".txt");
 
         InputStream stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
         UploadTask uploadTask = fileRef.putStream(stream);

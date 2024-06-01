@@ -1,10 +1,14 @@
 package com.example.seproject.book_lists;
 
+import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,9 +19,11 @@ import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
 
 public abstract class ListFragmentAddDelete<T> extends Fragment {
 
-    private RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter;
+    protected RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter;
+    protected RecyclerView recyclerView;
 
-    protected View initView(View view){
+
+    protected void initView(View view){
         ImageButton addToListButton = view.findViewById(R.id.addToListButton);
         addToListButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,9 +41,13 @@ public abstract class ListFragmentAddDelete<T> extends Fragment {
             }
         });
 
-        Log.d("SEProject", "Initializing adapter");
-        RecyclerView recyclerView = view.findViewById(R.id.listRecyclerView);
-        adapter = initAdapter();
+
+        recyclerView = view.findViewById(R.id.listRecyclerView);
+    }
+
+    protected void setAdapterToRecycler(){
+        Log.d("SEProject", "Initializing recycler");
+
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -46,12 +56,8 @@ public abstract class ListFragmentAddDelete<T> extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
-
-        return view;
     }
 
-    @NonNull
-    public abstract ListRecyclerAdapter<? extends RecyclerView.ViewHolder, T> initAdapter();
 
     /**
      * Method to call when the add button is pressed. This method must cause the notifyAdapterItemInserted

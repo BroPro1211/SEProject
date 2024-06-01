@@ -1,6 +1,7 @@
 package com.example.seproject.book_lists.async_tasks;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -20,20 +21,13 @@ public class LoadImageFromUrlTask extends AsyncTask<String, Void, Bitmap> {
     public static class FailedToLoadImageException extends RuntimeException{}
 
     private Book book;
+    private Book.BookImageReceiver receiver;
+    private Context context;
 
-
-    // these fields cause a memory leakage, however an AsyncTask is short lived, on the order of
-    // at most a couple of seconds, and so even if the task finishes after the views are destroyed,
-    // they will still be garbage collected quickly after, once the task finishes
-    @SuppressLint("StaticFieldLeak")
-    private ImageView imageView;
-    @SuppressLint("StaticFieldLeak")
-    private ProgressBar progressBar;
-
-    public LoadImageFromUrlTask(Book book, ImageView imageView, ProgressBar progressBar) {
+    public LoadImageFromUrlTask(Context context, Book book, Book.BookImageReceiver receiver) {
+        this.context = context;
         this.book = book;
-        this.imageView = imageView;
-        this.progressBar = progressBar;
+        this.receiver = receiver;
     }
 
     @Override
@@ -43,7 +37,7 @@ public class LoadImageFromUrlTask extends AsyncTask<String, Void, Bitmap> {
         HttpURLConnection connection;
         try {
             URL connectionUrl = new URL(urlString);
-            Log.d("SEProject", "Downloading image from url "+ connectionUrl.toString());
+            Log.d("SEProject", "Downloading image from url "+ connectionUrl);
             connection = (HttpURLConnection) connectionUrl.openConnection();
 
             int responseCode = connection.getResponseCode();
@@ -82,8 +76,6 @@ public class LoadImageFromUrlTask extends AsyncTask<String, Void, Bitmap> {
         super.onPostExecute(result);
         Log.d("SEProject", "Successfully downloaded image");
 
-        book.saveImage(result);
-
-        book.setImage(imageView, progressBar);
+        book.saveImage(context, result, receiver);
     }
 }

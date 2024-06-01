@@ -71,7 +71,8 @@ public abstract class ImageAct extends MenuActivity {
                 + "-" + min
                 + "-" + sec
                 + ".jpeg";
-        StorageReference imageRef = FBref.refStorage.child(filePath() + "/" + filename);
+        StorageReference imageRef = null;
+        //FBref.refStorage.child(filePath() + "/" + filename);
 
         imageView.setDrawingCacheEnabled(true);
         imageView.buildDrawingCache();

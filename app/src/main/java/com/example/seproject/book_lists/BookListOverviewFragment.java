@@ -3,31 +3,45 @@ package com.example.seproject.book_lists;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.seproject.R;
+import com.example.seproject.book_lists.dialog_fragments.DeleteBookDialogFragment;
+import com.example.seproject.book_lists.dialog_fragments.DeleteBookListDialogFragment;
 import com.example.seproject.data_classes.Book;
 import com.example.seproject.data_classes.BookList;
 import com.example.seproject.data_classes.User;
 import com.example.seproject.book_lists.recycler_adapters.ListOfBooksRecyclerAdapter;
 import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class BookListOverviewFragment extends ListFragmentAddDelete<Book> {
+
+public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implements BookList.OrderedBooksReceiver {
     public static final String ARG_LIST_ID = "listID";
 
     private String listID;
     private BookList bookList;
 
-    private Button listInfoButton;
-    private RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter;
+    private ProgressBar progressBar1;
+    private ProgressBar progressBar2;
+    private ProgressBar recyclerProgressBar;
+    private ImageButton addToListButton;
+    private ImageButton deleteFromListButton;
+
 
     public static final String ADD_BOOK_TAG = "add book tag";
 
@@ -50,9 +64,6 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> {
 
         bookList = User.getCurrentUser().getBookLists().get(listID);
 
-        bookList.createOrderedBooks();
-        User.setCurrentlyViewedListOfBooks(bookList.getOrderedBooks());
-
         TextView listNameTV = view.findViewById(R.id.listNameTV);
         listNameTV.setText(bookList.getName());
         TextView listDescriptionTV = view.findViewById(R.id.listDescriptionTV);
@@ -62,16 +73,43 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> {
         else
             listDescriptionTV.setVisibility(View.GONE);
 
+        view.findViewById(R.id.recyclerProgressBar).setVisibility(View.VISIBLE);
+
         initView(view);
+
+        User.setCurrentlyViewedListOfBooks(new ArrayList<>());
+        adapter = new ListOfBooksRecyclerAdapter(this, null);
+        bookList.getOrderedBooks(this);
+
 
         return view;
     }
 
-
-    @NonNull
     @Override
-    public ListRecyclerAdapter<? extends RecyclerView.ViewHolder, Book> initAdapter() {
-        return new ListOfBooksRecyclerAdapter(this, null);
+    protected void initView(View view){
+        super.initView(view);
+
+        progressBar1 = view.findViewById(R.id.progressBar1);
+        progressBar2 = view.findViewById(R.id.progressBar2);
+        recyclerProgressBar = view.findViewById(R.id.recyclerProgressBar);
+
+        addToListButton = view.findViewById(R.id.addToListButton);
+        deleteFromListButton = view.findViewById(R.id.deleteFromListButton);
+
+    }
+
+    @Override
+    public void getOrderedBooks(List<Book> books) {
+        User.setCurrentlyViewedListOfBooks(books);
+
+        setAdapterToRecycler();
+
+        progressBar1.setVisibility(View.GONE);
+        progressBar2.setVisibility(View.GONE);
+        recyclerProgressBar.setVisibility(View.GONE);
+
+        addToListButton.setVisibility(View.VISIBLE);
+        deleteFromListButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -90,6 +128,12 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> {
 
     @Override
     public void onClickDeleteFromList(View v) {
+        Log.d("SEProject", "Opening delete book dialog");
 
+        DialogFragment deleteBookDialogFragment = DeleteBookDialogFragment.newInstance(listID);
+        deleteBookDialogFragment.show(getChildFragmentManager(), "delete list");
     }
+
+
+
 }

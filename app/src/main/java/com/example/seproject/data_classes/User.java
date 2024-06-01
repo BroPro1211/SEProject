@@ -39,7 +39,7 @@ public class User {
     }
 
     public void addBookList(String name, String description){
-        String key = FBref.FBUsers.child(uid).child("bookLists").push().getKey();
+        String key = FBref.FBUsers.child(uid).child(FBref.USER_BOOK_LISTS).push().getKey();
 
         BookList newBookList = new BookList(key, name, description);
 
@@ -48,7 +48,7 @@ public class User {
         orderedBookLists.add(newBookList);
         Log.d("SEProject", "Added list at position " + (orderedBookLists.size()-1));
 
-        FBref.FBUsers.child(uid).child("bookLists").child(key).setValue(newBookList);
+        FBref.FBUsers.child(uid).child(FBref.USER_BOOK_LISTS).child(key).setValue(newBookList);
 
         Log.d("SEProject", "Added book list " + key + " to user " + uid);
 
@@ -63,17 +63,13 @@ public class User {
         if (bookLists.size() == 0)
             addBookList("New List", "Add books to me!");
 
-        FBref.FBUsers.child(uid).child("bookLists").child(id).removeValue();
+        FBref.FBUsers.child(uid).child(FBref.USER_BOOK_LISTS).child(id).removeValue();
 
         Log.d("SEProject", "Deleted book list " + id + " from user " + uid);
 
 
     }
 
-    @Exclude
-    public int getBookListCount(){
-        return bookLists.size();
-    }
 
     public static void setCurrentUser(User user){
         loggedInUser = user;

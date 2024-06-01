@@ -2,6 +2,7 @@ package com.example.seproject.data_classes;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -9,14 +10,18 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.example.seproject.R;
 import com.example.seproject.book_lists.async_tasks.LoadImageFromUrlTask;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.Exclude;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 public class Book {
     private String bookID;
@@ -25,16 +30,22 @@ public class Book {
     private String description;
     private String genre;
     private int pageCount;
+    private String datePublished;
+
+    private Map<String, Review> reviews;
+    private int reviewSum;
+
     private String imageLink;
-    private List<Review> reviews;
     private Bitmap bookImage;
+    public static final String IMAGE_IN_FIREBASE_STORAGE = "image stored in firebase storage";
+
+    private ProgressBar detailsProgressBar;
+    private ImageView detailsImageView;
 
 
-    private ProgressBar detailsDialogProgressBar;
-    private ImageView detailsDialogImageView;
 
 
-    public Book(String bookID, String title, String author, String description, String genre, int pageCount, String imageLink) {
+    public Book(String bookID, String title, String author, String description, String genre, int pageCount, String datePublished, String imageLink) {
         if (Arrays.asList(bookID, title, author, description, genre, imageLink).contains(null))
             throw new RuntimeException("Book cannot have null field");
         this.bookID = bookID;
@@ -43,57 +54,104 @@ public class Book {
         this.description = description;
         this.genre = genre;
         this.pageCount = pageCount;
+        this.datePublished = datePublished;
         this.imageLink = imageLink;
+        reviews = null;
+        reviewSum = 0;
     }
 
 
-
     @Exclude
-    public void getAndSetImage(Context context, ImageView imageView, ProgressBar progressBar){
-        Log.d("SEProject", "Getting book image");
+    public void getImage(Context context, BookImageReceiver receiver){
+        Log.d("SEProject", "Getting book image for id " + bookID);
 
-        // checks if the image is already loaded, in the case of a book stored in a list
-        if (bookImage != null)
-            setImage(imageView, progressBar);
+        // checks if the image was already loaded
+        if (bookImage != null){
+            receiver.receiveBookImage(this, bookImage);
+            Log.d("SEProject", "Book image already on device");
+        }
+
+        // else, the image isn't loaded, and we download the image from the link or FB Storage
         else {
+            // checks if the image link is valid
             if (imageLink != null && imageLink.length() != 0){
-                LoadImageFromUrlTask task = new LoadImageFromUrlTask(this, imageView, progressBar);
-                try{
-                    // task downloads image, saves it to this.bookImage and calls setImage
-                    task.execute(imageLink);
-                } catch (LoadImageFromUrlTask.FailedToLoadImageException e){
-                    Log.d("SEProject", "Image download from " + imageLink + " failed");
+                // if the book is from FB, we download the image from firebase storage
+                if (imageLink.equals(IMAGE_IN_FIREBASE_STORAGE)){
+                    Log.d("SEProject", "Downloading book image from FB");
+                    String fileName = bookID + FBref.IMAGE_FILE_EXTENSION;
+                    StorageReference bookImageReference = FBref.FBBookImages.child(fileName);
 
-                    // if the task failed, the default book icon will be applied
-                    getAndSetDefaultImage(context, imageView, progressBar);
+                    final long ONE_MEGABYTE = 1024 * 1024;
+                    bookImageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Log.d("SEProject", "Successfully downloaded image from FB");
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
+                            saveImage(context, bitmap, receiver);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            Log.d("SEProject", "FB image download from " + fileName + " failed");
+
+                            // if the download failed, the default book icon will be applied
+                            getDefaultImage(context, receiver);
+                        }
+                    });
+                }
+
+                // else, we use the download link
+                else {
+                    Log.d("SEProject", "Downloading book image from url " + imageLink);
+                    LoadImageFromUrlTask task = new LoadImageFromUrlTask(context, this, receiver);
+                    try{
+                        // task downloads image, saves it to this.bookImage, calls the receiver and
+                        // updates the details ImageView and ProgressBar if present
+                        task.execute(imageLink);
+                    }
+                    catch (LoadImageFromUrlTask.FailedToLoadImageException e){
+                        Log.d("SEProject", "Image download from " + imageLink + " failed, downloading default icon");
+
+                        // if the task failed, the default book icon will be applied
+                        getDefaultImage(context, receiver);
+
+                    }
                 }
             }
-            else
-                getAndSetDefaultImage(context, imageView, progressBar);
+
+            // if no image link provided, the default icon will be applied
+            else {
+                Log.d("SEProject", "No image url found, downloading default icon");
+                getDefaultImage(context, receiver);
+            }
         }
 
     }
 
-    private void getAndSetDefaultImage(Context context, ImageView imageView, ProgressBar progressBar){
+    private void getDefaultImage(Context context, BookImageReceiver receiver){
+        // creates a bitmap of the default icon
         Drawable drawable = AppCompatResources.getDrawable(context, R.drawable.baseline_book_75);
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
 
-        bookImage = bitmap;
-
-        setImage(imageView, progressBar);
+        saveImage(context, bitmap, receiver);
     }
 
-    @Exclude
-    public void saveImage(Bitmap image){
+    // Called when the book image is set. If the book image finishes downloading after the book details
+    // page is opened, the image will be loaded there.
+    public void saveImage(Context context, Bitmap image, BookImageReceiver receiver){
+        if (image == null)
+            getDefaultImage(context, receiver);
+
+        Log.d("SEProject", "Saving book image for " + bookID);
         this.bookImage = image;
 
-        if (detailsDialogImageView != null && detailsDialogProgressBar != null){
-            setImage(detailsDialogImageView, detailsDialogProgressBar);
-        }
+        if (receiver != null)
+            receiver.receiveBookImage(this, bookImage);
+        setDetailsImage();
     }
 
     @Exclude
@@ -106,28 +164,85 @@ public class Book {
         progressBar.setVisibility(View.INVISIBLE);
     }
 
-    @Exclude
-    public void setDetailsDialogProgressBar(ProgressBar progressBar){
-        this.detailsDialogProgressBar = progressBar;
-    }
-    @Exclude
-    public void setDetailsDialogImageView(ImageView imageView){
-        this.detailsDialogImageView = imageView;
-    }
-    @Exclude
-    public ProgressBar getDetailsDialogProgressBar() {
-        return detailsDialogProgressBar;
-    }
-    @Exclude
-    public ImageView getDetailsDialogImageView() {
-        return detailsDialogImageView;
+    public interface BookImageReceiver{
+        void receiveBookImage(Book book, Bitmap image);
     }
 
+    @Exclude
+    public void setDetailsImage(){
+        if (bookImage == null)
+            return;
+        if (detailsProgressBar == null || detailsImageView == null)
+            return;
+
+        Log.d("SEProject", "Setting image in details page for book " + bookID);
+        setImage(detailsImageView, detailsProgressBar);
+        detailsImageView = null;
+        detailsProgressBar = null;
+
+    }
+    @Exclude
+    public void setDetailsProgressBar(ProgressBar progressBar){
+        this.detailsProgressBar = progressBar;
+    }
+    @Exclude
+    public void setDetailsImageView(ImageView imageView){
+        this.detailsImageView = imageView;
+    }
+
+    @Exclude
+    public void setImageLink(String imageLink){
+        this.imageLink = imageLink;
+    }
 
 
+    private String getTextIfEmpty(String s, String parameter){
+        if (s == null || s.length() == 0)
+            return "Book " + parameter + " not found";
+        return s;
+    }
+    @Exclude
+    public String getDisplayTitle(){
+        return getTextIfEmpty(title, "title");
+    }
+    @Exclude
+    public String getDisplayAuthor(){
+        return getTextIfEmpty(author, "author");
+    }
+    @Exclude
+    public String getDisplayDescription(){
+        return getTextIfEmpty(description, "description");
+    }
+    @Exclude
+    public String getDisplayGenre(){
+        return getTextIfEmpty(genre, "genre");
+    }
+    @Exclude
+    public String getDisplayPageCount(){
+        if (pageCount == 0)
+            return "Book page count not found";
+        return String.valueOf(pageCount);
+    }
+    @Exclude
+    public String getDisplayDatePublished(){
+        return getTextIfEmpty(datePublished, "date published");
+    }
 
 
+    private String shortenString(String s, int length){
+        if (s.length() <= length)
+            return s;
+        return s.substring(0, length) + "...";
+    }
+    @Exclude
+    public String getBookShortInfo(){
+        return shortenString(title, 15) + "\n" + shortenString(author, 15);
+    }
 
+
+    public Book(){
+
+    }
 
     public String getBookID() {
         return bookID;
@@ -153,8 +268,24 @@ public class Book {
         return pageCount;
     }
 
+    public String getDatePublished() {
+        return datePublished;
+    }
 
-    public List<Review> getReviews() {
+    public void setReviews(Map<String, Review> reviews) {
+        this.reviews = reviews;
+    }
+
+    public void setReviewSum(int reviewSum) {
+        this.reviewSum = reviewSum;
+    }
+
+    public Map<String, Review> getReviews() {
         return reviews;
     }
+
+    public int getReviewSum() {
+        return reviewSum;
+    }
+
 }

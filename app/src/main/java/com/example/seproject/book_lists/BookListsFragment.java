@@ -19,7 +19,7 @@ import com.example.seproject.data_classes.User;
 import com.example.seproject.book_lists.recycler_adapters.BookListsRecyclerAdapter;
 import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
 
-public class BookListsFragment extends ListFragmentAddDelete {
+public class BookListsFragment extends ListFragmentAddDelete<BookList> {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -29,15 +29,13 @@ public class BookListsFragment extends ListFragmentAddDelete {
 
         initView(view);
 
+        adapter =  new BookListsRecyclerAdapter(User.getOrderedBookLists(), this);
+        setAdapterToRecycler();
+
         return view;
     }
 
 
-    @NonNull
-    @Override
-    public ListRecyclerAdapter<? extends RecyclerView.ViewHolder, BookList> initAdapter(){
-        return new BookListsRecyclerAdapter(User.getOrderedBookLists(), this);
-    }
 
     @Override
     public void onClickAddToList(View v) {
