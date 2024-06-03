@@ -24,36 +24,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".alpha.FBDatabaseAct"
-            android:exported="false" />
 
-        <receiver
-            android:name=".alpha.NotificationReceiver"
-            android:enabled="true"
-            android:exported="true" />
         <receiver
             android:name=".tools.ReadingRemindersReceiver"
             android:enabled="true"
             android:exported="true" />
-        <activity
-            android:name=".alpha.NotificationsAct"
-            android:exported="false" />
-        <activity
-            android:name=".alpha.GalleryAct"
-            android:exported="false" />
-        <activity
-            android:name=".alpha.CameraAct"
-            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan"
             android:exported="false">
 
         </activity>
-        <activity
-            android:name=".alpha.SharedPreferencesAct"
-            android:exported="false" />
         <activity
             android:name=".registration.SignUp"
             android:exported="false" />
