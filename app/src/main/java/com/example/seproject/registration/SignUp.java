@@ -1,4 +1,4 @@
-package com.example.seproject;
+package com.example.seproject.registration;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.seproject.R;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.User;
 import com.google.android.gms.tasks.OnCompleteListener;

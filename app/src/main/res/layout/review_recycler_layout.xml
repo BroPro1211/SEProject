@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    >
+
+
+    <TextView
+        android:id="@+id/reviewUsernameTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
+
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Username"
+        android:textColor="@color/dark_gray_text"
+
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/deleteReviewButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RatingBar
+        android:id="@+id/reviewStarsRatingBar"
+        style="?android:attr/ratingBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+
+
+        app:layout_constraintStart_toStartOf="@+id/reviewUsernameTV"
+        app:layout_constraintTop_toTopOf="@+id/reviewDateTV" />
+
+    <TextView
+        android:id="@+id/reviewDateTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+
+        android:text="15/04/2024"
+        android:textSize="16sp"
+
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/deleteReviewButton"
+        app:layout_constraintStart_toEndOf="@+id/reviewStarsRatingBar"
+        app:layout_constraintTop_toBottomOf="@+id/reviewUsernameTV" />
+
+    <ImageButton
+        android:id="@+id/deleteReviewButton"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="2dp"
+        android:src="@drawable/baseline_delete_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"/>
+
+
+    <TextView
+        android:id="@+id/reviewDescriptionV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Review description, this is text! Book is great!"
+        android:textColor="@color/black"
+
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/reviewDateTV" />
+</androidx.constraintlayout.widget.ConstraintLayout>

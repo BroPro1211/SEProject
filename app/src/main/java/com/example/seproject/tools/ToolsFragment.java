@@ -63,7 +63,7 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
                 if (o)
                     enableReadingReminders();
                 else {
-                    Toast.makeText(getContext(), "Grant notifications permission to use this feature", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Please grant notifications permission", Toast.LENGTH_LONG).show();
                     readingRemindersSwitch.setChecked(false);
                 }
             }

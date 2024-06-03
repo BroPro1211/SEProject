@@ -13,6 +13,7 @@ public class FBref {
     public static final DatabaseReference FBBooks = FBDB.getReference("Books");
     public static final String USER_BOOK_LISTS = "bookLists";
     public static final String USER_BOOKS = "books";
+    public static final String BOOK_REVIEWS = "reviews";
     public static final FirebaseStorage FBStorage = FirebaseStorage.getInstance();
     public static final StorageReference FBBookImages = FBStorage.getReference("bookImages");
     public static final String IMAGE_FILE_EXTENSION = ".jpeg";

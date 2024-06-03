@@ -102,7 +102,7 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
     public void getOrderedBooks(List<Book> books) {
         User.setCurrentlyViewedListOfBooks(books);
 
-        setAdapterToRecycler();
+        ListRecyclerAdapter.setAdapterToRecycler(adapter, recyclerView, getContext());
 
         progressBar1.setVisibility(View.GONE);
         progressBar2.setVisibility(View.GONE);
@@ -131,7 +131,7 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
         Log.d("SEProject", "Opening delete book dialog");
 
         DialogFragment deleteBookDialogFragment = DeleteBookDialogFragment.newInstance(listID);
-        deleteBookDialogFragment.show(getChildFragmentManager(), "delete list");
+        deleteBookDialogFragment.show(getChildFragmentManager(), "delete book");
     }
 
 

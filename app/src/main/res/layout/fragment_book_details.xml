@@ -106,7 +106,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="10dp">
 
             <TextView
                 android:id="@+id/textView5"
@@ -263,60 +263,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <include
                 android:id="@+id/reviewsLayout"
+                layout="@layout/reviews_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-
-
-                app:layout_constraintTop_toBottomOf="@+id/textView8">
-
-                <TextView
-                    android:id="@+id/reviewsTV"
-                    android:layout_width="0dp"
-                    android:layout_height="45dp"
-
-                    android:background="@color/light_gray"
-                    android:gravity="start|center"
-
-                    android:paddingHorizontal="4dp"
-                    android:text="257 reviews"
-                    android:textColor="@color/dark_gray_text"
-
-                    android:textSize="18sp"
-
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <RatingBar
-                    android:id="@+id/totalRatingBar"
-                    style="?android:attr/ratingBarStyleIndicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    android:isIndicator="true"
-                    android:rating="3.6"
-                    android:stepSize="0.1"
-
-                    app:layout_constraintBottom_toBottomOf="@+id/reviewsTV"
-                    app:layout_constraintEnd_toEndOf="@+id/reviewsTV"
-                    app:layout_constraintTop_toTopOf="@+id/reviewsTV" />
-
-                <include
-                    android:visibility="gone"
-                    android:id="@+id/reviewsListLayout"
-                    layout="@layout/recycler_list_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/reviewsTV"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
+                app:layout_constraintTop_toBottomOf="@id/textView8" />
 
             <Space
                 android:id="@+id/space3"

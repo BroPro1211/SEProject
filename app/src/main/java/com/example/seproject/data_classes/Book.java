@@ -20,8 +20,15 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Book {
     private String bookID;
@@ -33,7 +40,7 @@ public class Book {
     private String datePublished;
 
     private Map<String, Review> reviews;
-    private int reviewSum;
+    private List<Review> orderedReviews;
 
     private String imageLink;
     private Bitmap bookImage;
@@ -57,7 +64,6 @@ public class Book {
         this.datePublished = datePublished;
         this.imageLink = imageLink;
         reviews = null;
-        reviewSum = 0;
     }
 
 
@@ -196,6 +202,60 @@ public class Book {
     }
 
 
+    @Exclude
+    public List<Review> getOrderedReviews(){
+        if (orderedReviews == null)
+            orderedReviews = new ArrayList<>();
+        return orderedReviews;
+    }
+
+    // adds review and returns the position in orderedReviews to which it was added
+    public int addReview(Review review){
+        if (review == null)
+            throw new RuntimeException("Attempted to add null review to book " + bookID);
+
+        Log.d("SEProject", "adding review by " + review.getUid() + " to book " + bookID);
+
+        getReviews().put(review.getUid(), review);
+
+        if (! containsUserReview()){
+            Log.d("SEProject", "added review to index 0");
+            getOrderedReviews().add(0, review);
+            return 0;
+        }
+        else {
+            Log.d("SEProject", "added review to index 1");
+            getOrderedReviews().add(1, review);
+            return 1;
+        }
+    }
+    // deletes review and returns the position in orderedReviews from which it was deleted
+    public int deleteReview(Review review){
+        if (review == null)
+            throw new RuntimeException("Attempted to remove null review from book " + bookID);
+
+        Log.d("SEProject", "removing review by " + review.getUid() + " from book " + bookID);
+
+        getReviews().remove(review.getUid());
+
+        int pos = 0;
+        for (int i = 0; i < getOrderedReviews().size(); i++){
+            if (getOrderedReviews().get(i).getUid().equals(review.getUid())){
+                pos = i;
+                break;
+            }
+        }
+        getOrderedReviews().remove(pos);
+        return pos;
+    }
+    private boolean containsUserReview(){
+        return !getOrderedReviews().isEmpty() && getOrderedReviews().get(0).isCurrentUserReview();
+    }
+    public void clearReviews(){
+        reviews = null;
+        orderedReviews = null;
+    }
+
     private String getTextIfEmpty(String s, String parameter){
         if (s == null || s.length() == 0)
             return "Book " + parameter + " not found";
@@ -240,6 +300,8 @@ public class Book {
     }
 
 
+
+
     public Book(){
 
     }
@@ -273,19 +335,16 @@ public class Book {
     }
 
     public void setReviews(Map<String, Review> reviews) {
+
         this.reviews = reviews;
     }
 
-    public void setReviewSum(int reviewSum) {
-        this.reviewSum = reviewSum;
-    }
 
     public Map<String, Review> getReviews() {
+        if (reviews == null)
+            reviews = new LinkedHashMap<>();
         return reviews;
     }
 
-    public int getReviewSum() {
-        return reviewSum;
-    }
 
 }

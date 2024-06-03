@@ -1,5 +1,6 @@
 package com.example.seproject.book_lists;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,19 +44,6 @@ public abstract class ListFragmentAddDelete<T> extends Fragment {
 
 
         recyclerView = view.findViewById(R.id.listRecyclerView);
-    }
-
-    protected void setAdapterToRecycler(){
-        Log.d("SEProject", "Initializing recycler");
-
-        recyclerView.setAdapter(adapter);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                layoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
 

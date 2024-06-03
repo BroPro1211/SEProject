@@ -30,7 +30,7 @@ public class BookListsFragment extends ListFragmentAddDelete<BookList> {
         initView(view);
 
         adapter =  new BookListsRecyclerAdapter(User.getOrderedBookLists(), this);
-        setAdapterToRecycler();
+        ListRecyclerAdapter.setAdapterToRecycler(adapter, recyclerView, getContext());
 
         return view;
     }

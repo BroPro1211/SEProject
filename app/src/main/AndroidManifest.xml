@@ -55,10 +55,10 @@
             android:name=".alpha.SharedPreferencesAct"
             android:exported="false" />
         <activity
-            android:name=".SignUp"
+            android:name=".registration.SignUp"
             android:exported="false" />
         <activity
-            android:name=".LogIn"
+            android:name=".registration.LogIn"
             android:exported="false" />
     </application>
 
