@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.example.seproject.R;
 import com.example.seproject.book_lists.dialog_fragments.AddReviewDialogFragment;
-import com.example.seproject.book_lists.dialog_fragments.DeleteBookDialogFragment;
 import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
 import com.example.seproject.book_lists.recycler_adapters.ReviewsRecyclerAdapter;
 import com.example.seproject.data_classes.Book;
@@ -28,20 +27,12 @@ import com.example.seproject.data_classes.BookList;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.Review;
 import com.example.seproject.data_classes.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 
 public class BookDetailsFragment extends Fragment implements View.OnClickListener,FetchBookFromFB.OnGetBook {
@@ -49,7 +40,6 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
     public static final String ARG_BOOK_POSITION_IN_CURRENTLY_VIEWED_LIST = "book pos in currently viewed list";
     public static final String ARG_LIST_ID = "list id";
 
-    private int bookPos;
     private Book book;
     private boolean alreadyInFB;
 
@@ -71,84 +61,101 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
     private int totalStars;
 
     private DatabaseReference reviewsReference;
-    private static final GenericTypeIndicator<Map<String, Review>> typeIndicator = new GenericTypeIndicator<Map<String, Review>>() {};
 
 
     private ReviewsRecyclerAdapter adapter;
-    private final ChildEventListener reviewsListener = new ChildEventListener() {
-        @Override
-        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            Log.d("SEProject", "on child added called for " + book.getBookID());
-
-            Review review = snapshot.getValue(Review.class);
-            if (review == null){
-                return;
-            }
-
-            int pos = book.addReview(review);
-            totalStars += review.getStarNum();
-
-            if (review.isCurrentUserReview()){
-                bookDetailsFAB.setVisibility(View.INVISIBLE);
-            }
-
-            if (! showingReviews()) {
-                initReviewList();
-            }
-            else{
-                adapter.notifyItemInserted(pos);
-            }
-        }
-
-        @Override
-        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-            Log.d("SEProject", "on child changed called for book " + book.getBookID());
-        }
-
-        @Override
-        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-            Log.d("SEProject", "on child removed called for " + book.getBookID());
-
-            Review review = snapshot.getValue(Review.class);
-            if (review == null){
-                return;
-            }
-
-            totalStars -= review.getStarNum();
-
-            int pos = book.deleteReview(review);
-            adapter.notifyItemRemoved(pos);
-
-            if (review.isCurrentUserReview()){
-                bookDetailsFAB.setVisibility(View.VISIBLE);
-            }
-
-            if (book.getReviews().isEmpty()){
-                noBookReviews();
-            }
-        }
-
-        @Override
-        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-            Log.d("SEProject", "on child moved called for book " + book.getBookID());
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError error) {
-            Log.d("SEProject", "reviews listener cancelled for book " + book.getBookID(), error.toException());
-            onException();
-        }
-    };
+    private ChildEventListener reviewsListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            bookPos = getArguments().getInt(ARG_BOOK_POSITION_IN_CURRENTLY_VIEWED_LIST);
+            int bookPos = getArguments().getInt(ARG_BOOK_POSITION_IN_CURRENTLY_VIEWED_LIST);
             book = User.getCurrentlyViewedListOfBooks().get(bookPos);
             addToListID = getArguments().getString(ARG_LIST_ID);
             reviewsReference = FBref.FBBooks.child(book.getBookID()).child(FBref.BOOK_REVIEWS);
+            reviewsListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                    Log.d("SEProject", "on child added called for " + book.getBookID());
+
+                    Review review = snapshot.getValue(Review.class);
+                    if (review == null){
+                        return;
+                    }
+
+                    int pos = book.addReview(review);
+                    totalStars += review.getStarNum();
+
+                    if (review.isCurrentUserReview()){
+                        bookDetailsFAB.setVisibility(View.INVISIBLE);
+                    }
+
+                    if (! showingReviews()) {
+                        initReviewList();
+                    }
+                    else{
+                        adapter.notifyItemInserted(pos);
+                        updateReviewsTVs();
+                    }
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    Log.d("SEProject", "on child changed called for book " + book.getBookID());
+
+                    Review review = snapshot.getValue(Review.class);
+                    if (review == null){
+                        return;
+                    }
+
+                    int pos = book.findReviewUid(review.getUid());
+
+                    book.getOrderedReviews().get(pos).setUserLikesMap(review.getUserLikesMap());
+
+
+                    Log.d("SEProject", "updating adapter at pos " + pos);
+                    adapter.notifyItemChanged(pos);
+
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                    Log.d("SEProject", "on child removed called for " + book.getBookID());
+
+                    Review review = snapshot.getValue(Review.class);
+                    if (review == null){
+                        return;
+                    }
+
+                    totalStars -= review.getStarNum();
+
+                    int pos = book.deleteReview(review);
+                    adapter.notifyItemRemoved(pos);
+
+                    if (review.isCurrentUserReview()){
+                        bookDetailsFAB.setVisibility(View.VISIBLE);
+                    }
+                    updateReviewsTVs();
+
+                    if (book.getReviews().isEmpty()){
+                        noBookReviews();
+
+                    }
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    Log.d("SEProject", "on child moved called for book " + book.getBookID());
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.d("SEProject", "reviews listener cancelled for book " + book.getBookID(), error.toException());
+                    onException();
+                }
+            };
         }
     }
 
@@ -316,7 +323,7 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
 
     // sets the review layout to show no reviews
     private void noBookReviews(){
-        Log.d("SEProject", "setting book " + book.getBookID() + " details screen to no reviews");
+        Log.d("SEProject", "Setting book " + book.getBookID() + " details screen to no reviews");
 
         if (showingReviews())
             closeReviewsList();
@@ -352,6 +359,11 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
     }
 
     private void updateReviewsTVs(){
+        if (book.getOrderedReviews().size() == 0){
+            return;
+        }
+
+
         float averageRating = ((float)totalStars) / book.getReviews().size();
         totalRatingBar.setRating(averageRating);
 
@@ -379,13 +391,25 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
                 .child(User.getCurrentUser().getUid()).removeValue();
     }
 
-
-
     private boolean addingToList(){
         return addToListID != null;
     }
 
+    public void removeReviewLikeFromFB(int pos){
+        String reviewUid = book.getOrderedReviews().get(pos).getUid();
 
+        FBref.FBBooks.child(book.getBookID()).child(FBref.BOOK_REVIEWS)
+                .child(reviewUid).child(FBref.REVIEW_USER_LIKES_MAP).child(User.getCurrentUser().getUid())
+                .removeValue();
+    }
+    public void addReviewLikeToFB(int pos){
+        String reviewUid = book.getOrderedReviews().get(pos).getUid();
+
+        FBref.FBBooks.child(book.getBookID()).child(FBref.BOOK_REVIEWS)
+                .child(reviewUid).child(FBref.REVIEW_USER_LIKES_MAP).child(User.getCurrentUser().getUid())
+                .setValue(true);
+
+    }
 
     @Override
     public void onDestroyView() {

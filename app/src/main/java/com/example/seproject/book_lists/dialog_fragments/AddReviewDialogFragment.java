@@ -7,17 +7,14 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.example.seproject.R;
-import com.example.seproject.book_lists.BookListsFragment;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.Review;
 import com.example.seproject.data_classes.User;

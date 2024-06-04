@@ -2,10 +2,15 @@ package com.example.seproject.registration;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,13 +23,14 @@ import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.User;
-import com.example.seproject.registration.SignUp;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.storage.StorageReference;
 
 public class LogIn extends AppCompatActivity {
     private EditText emailET;
@@ -128,11 +134,32 @@ public class LogIn extends AppCompatActivity {
                     Log.d("SEProject", "Successfully retrieved user data from FB");
                     User user = task.getResult().getValue(User.class);
 
-                    //for (BookList)
-                    //Log.d()
-                    User.setCurrentUser(user);
 
-                    enterApplication(context, activity);
+                    String fileName = user.getUid() + FBref.IMAGE_FILE_EXTENSION;
+                    StorageReference bookImageReference = FBref.FBUserImages.child(fileName);
+                    Log.d("SEProject", "Downloading user profile image");
+
+                    final long ONE_MEGABYTE = 1024 * 1024;
+                    bookImageReference.getBytes(ONE_MEGABYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+                        @Override
+                        public void onComplete(@NonNull Task<byte[]> task) {
+                            if (task.isSuccessful()){
+                                Log.d("SEProject", "Successfully downloaded image from FB");
+                                byte[] bytes = task.getResult();
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+                                user.setProfileImage(bitmap);
+                            }
+                            else{
+                                Log.d("SEProject", "Profile image not found");
+                            }
+                            User.setCurrentUser(user);
+
+                            enterApplication(context, activity);
+                        }
+                    });
+
+
                 }
                 else {
                     Toast.makeText(context, "Failed to retrieve user data", Toast.LENGTH_LONG).show();
@@ -144,12 +171,19 @@ public class LogIn extends AppCompatActivity {
         });
     }
 
+
     public static void enterApplication(Context context, Activity activity){
         Log.d("SEProject", "User successfully logged in, navigating to main");
 
         User.checkCurrentUser();
 
         User.createOrderedBookLists();
+
+        if (User.getCurrentUser().getProfileImage() == null){
+            // set default image
+
+            User.getCurrentUser().setProfileImage(User.getBitmapFromDrawable(context, R.drawable.baseline_person_gray_24));
+        }
 
         Intent i = new Intent(context, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

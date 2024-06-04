@@ -2,33 +2,27 @@ package com.example.seproject.tools;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.seproject.R;
 
-import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ReadingModeFragment extends Fragment implements Runnable, View.OnClickListener{
     private TextView elapsedTimeTV;
     private int elapsedSeconds;
     private ScheduledExecutorService scheduledExecutorService;
-    private Button doneButton;
     private int currentNotificationsFilter;
     private NotificationManager notificationManager;
 
@@ -53,7 +47,7 @@ public class ReadingModeFragment extends Fragment implements Runnable, View.OnCl
 
 
         elapsedTimeTV = view.findViewById(R.id.elapsedTimeTV);
-        doneButton = view.findViewById(R.id.doneButton);
+        Button doneButton = view.findViewById(R.id.doneButton);
 
         elapsedSeconds = 0;
 

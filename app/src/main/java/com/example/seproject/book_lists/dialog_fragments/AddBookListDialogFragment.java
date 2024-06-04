@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import com.example.seproject.R;
 import com.example.seproject.book_lists.BookListsFragment;
-import com.example.seproject.book_lists.ListFragmentAddDelete;
 import com.example.seproject.data_classes.User;
 
 public class AddBookListDialogFragment extends DialogFragment {

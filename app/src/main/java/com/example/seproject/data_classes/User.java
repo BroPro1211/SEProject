@@ -1,7 +1,14 @@
 package com.example.seproject.data_classes;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import androidx.appcompat.content.res.AppCompatResources;
+
+import com.example.seproject.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Exclude;
 
@@ -21,6 +28,8 @@ public class User {
     private static List<Book> currentlyViewedListOfBooks;
     // an ordering of the current list of books that is being viewed, for the book list overview page
     // and book search page
+
+    private Bitmap profileImage;
 
     public User(String uid, String username){
         if (uid == null || username == null || uid.length() == 0 || username.length() == 0)
@@ -104,6 +113,25 @@ public class User {
 
     public static List<BookList> getOrderedBookLists(){
         return orderedBookLists;
+    }
+
+    @Exclude
+    public Bitmap getProfileImage(){
+        return profileImage;
+    }
+    @Exclude
+    public void setProfileImage(Bitmap image){
+        profileImage = image;
+    }
+
+    public static Bitmap getBitmapFromDrawable(Context context, int drawableId){
+        Drawable drawable = AppCompatResources.getDrawable(context, drawableId);
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
 

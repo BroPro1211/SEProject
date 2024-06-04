@@ -2,9 +2,7 @@ package com.example.seproject.book_lists;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,7 +36,7 @@ public class BookListsFragment extends ListFragmentAddDelete<BookList> {
 
 
     @Override
-    public void onClickAddToList(View v) {
+    public void onClickAddToList() {
         Log.d("SEProject", "Opening add book list dialog");
 
         DialogFragment addListFragment = new AddBookListDialogFragment();
@@ -46,7 +44,7 @@ public class BookListsFragment extends ListFragmentAddDelete<BookList> {
     }
 
     @Override
-    public void onClickDeleteFromList(View v) {
+    public void onClickDeleteFromList() {
         Log.d("SEProject", "Opening delete book list dialog");
 
         DialogFragment deleteListFragment = new DeleteBookListDialogFragment();

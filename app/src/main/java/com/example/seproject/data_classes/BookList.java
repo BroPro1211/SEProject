@@ -9,8 +9,6 @@ import androidx.fragment.app.FragmentManager;
 import com.example.seproject.book_lists.BookDetailsFragment;
 import com.example.seproject.book_lists.BookListOverviewFragment;
 import com.example.seproject.book_lists.FetchBookFromFB;
-import com.example.seproject.book_lists.ListFragmentAddDelete;
-import com.example.seproject.book_lists.recycler_adapters.ListOfBooksRecyclerAdapter;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.Exclude;
@@ -25,7 +23,6 @@ import java.util.Map;
 
 
 public class BookList  {
-
 
     private String listID;
     private String name;
@@ -193,9 +190,9 @@ public class BookList  {
 
     }
     private static class CreateOrderedBooks implements FetchBookFromFB.OnGetBook {
-        private List<Book> orderedBooks;
-        private boolean end;
-        private OrderedBooksReceiver receiver;
+        private final List<Book> orderedBooks;
+        private final boolean end;
+        private final OrderedBooksReceiver receiver;
         public CreateOrderedBooks(List<Book> orderedBooks, boolean end, OrderedBooksReceiver receiver){
             this.orderedBooks = orderedBooks;
             this.end = end;

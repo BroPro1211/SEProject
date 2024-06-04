@@ -1,13 +1,10 @@
 package com.example.seproject.book_lists.async_tasks;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.example.seproject.data_classes.Book;
 
@@ -20,9 +17,9 @@ import java.net.URL;
 public class LoadImageFromUrlTask extends AsyncTask<String, Void, Bitmap> {
     public static class FailedToLoadImageException extends RuntimeException{}
 
-    private Book book;
-    private Book.BookImageReceiver receiver;
-    private Context context;
+    private final Book book;
+    private final Book.BookImageReceiver receiver;
+    private final Context context;
 
     public LoadImageFromUrlTask(Context context, Book book, Book.BookImageReceiver receiver) {
         this.context = context;

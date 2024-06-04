@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
 
 public abstract class ListRecyclerAdapter<U extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<U>{
     protected final Fragment fragment;

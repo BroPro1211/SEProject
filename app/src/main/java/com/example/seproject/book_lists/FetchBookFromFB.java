@@ -1,7 +1,6 @@
 package com.example.seproject.book_lists;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -14,14 +13,14 @@ import com.google.firebase.database.DataSnapshot;
 public class FetchBookFromFB implements OnCompleteListener<DataSnapshot> {
 
 
-    public static interface OnGetBook{
-        abstract void onSuccess(Book book);
-        abstract void onFailure();
+    public interface OnGetBook{
+        void onSuccess(Book book);
+        void onFailure();
     }
 
     public static class FailedToFetchBookException extends RuntimeException{}
 
-    private OnGetBook parent;
+    private final OnGetBook parent;
 
     public FetchBookFromFB(OnGetBook parent){
         this.parent = parent;

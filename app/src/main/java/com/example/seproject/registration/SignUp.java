@@ -115,23 +115,6 @@ public class SignUp extends AppCompatActivity {
                             Log.d("SEProject", "Successfully created user");
 
 
-                            // how to save to fb storage
-                            /*StorageReference userFolderRef = FBref.refStorage.child( FBref.USERS_FOLDER_PATH + uid + "/");
-                            UploadTask uploadTask = userFolderRef.putFile(uri);
-                            uploadTask.addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    Toast toast = Toast.makeText(getBaseContext(), "Failed to load to FB Storage", Toast.LENGTH_SHORT);
-                                    toast.show();
-                                }
-                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    Toast toast = Toast.makeText(getBaseContext(), "Successfully saved to FB", Toast.LENGTH_SHORT);
-                                    toast.show();
-                                }
-                            });*/
-
                             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
                             User user = new User(uid, username);

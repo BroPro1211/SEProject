@@ -2,24 +2,19 @@ package com.example.seproject.book_lists;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.seproject.R;
 import com.example.seproject.book_lists.dialog_fragments.DeleteBookDialogFragment;
-import com.example.seproject.book_lists.dialog_fragments.DeleteBookListDialogFragment;
 import com.example.seproject.data_classes.Book;
 import com.example.seproject.data_classes.BookList;
 import com.example.seproject.data_classes.User;
@@ -34,7 +29,6 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
     public static final String ARG_LIST_ID = "listID";
 
     private String listID;
-    private BookList bookList;
 
     private ProgressBar progressBar1;
     private ProgressBar progressBar2;
@@ -62,7 +56,7 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
         if (listID == null)
             throw new RuntimeException("Attempted to open book list overview with no id provided");
 
-        bookList = User.getCurrentUser().getBookLists().get(listID);
+        BookList bookList = User.getCurrentUser().getBookLists().get(listID);
 
         TextView listNameTV = view.findViewById(R.id.listNameTV);
         listNameTV.setText(bookList.getName());
@@ -113,7 +107,7 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
     }
 
     @Override
-    public void onClickAddToList(View v) {
+    public void onClickAddToList() {
         FragmentManager fragmentManager = getParentFragmentManager();
 
         Bundle args = new Bundle();
@@ -127,7 +121,7 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
     }
 
     @Override
-    public void onClickDeleteFromList(View v) {
+    public void onClickDeleteFromList() {
         Log.d("SEProject", "Opening delete book dialog");
 
         DialogFragment deleteBookDialogFragment = DeleteBookDialogFragment.newInstance(listID);

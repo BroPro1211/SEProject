@@ -1,22 +1,17 @@
 package com.example.seproject.book_lists;
 
-import android.content.Context;
-import android.os.Bundle;
+
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.seproject.R;
-import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
+
 
 public abstract class ListFragmentAddDelete<T> extends Fragment {
 
@@ -29,7 +24,7 @@ public abstract class ListFragmentAddDelete<T> extends Fragment {
         addToListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClickAddToList(v);
+                onClickAddToList();
             }
         });
 
@@ -38,7 +33,7 @@ public abstract class ListFragmentAddDelete<T> extends Fragment {
         deleteFromListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClickDeleteFromList(v);
+                onClickDeleteFromList();
             }
         });
 
@@ -50,9 +45,8 @@ public abstract class ListFragmentAddDelete<T> extends Fragment {
     /**
      * Method to call when the add button is pressed. This method must cause the notifyAdapterItemInserted
      * method to be called.
-     * @param v View clicked
      */
-    public abstract void onClickAddToList(View v);
+    public abstract void onClickAddToList();
     /**
      * Notifies the adapter of the insertion
      * @param position Position at which the item was inserted. Call with -1 to signify insertion to the end of the list.
@@ -67,9 +61,8 @@ public abstract class ListFragmentAddDelete<T> extends Fragment {
     /**
      * Method to call when the delete button is pressed. This method must cause the notifyAdapterItemRemoved
      * method to be called.
-     * @param v View clicked
      */
-    public abstract void onClickDeleteFromList(View v);
+    public abstract void onClickDeleteFromList();
     /**
      * Notifies the adapter of the deletion
      * @param position Position at which the item was deleted

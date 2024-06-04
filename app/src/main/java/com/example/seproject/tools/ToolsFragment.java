@@ -33,13 +33,12 @@ import java.util.Calendar;
 
 
 public class ToolsFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener{
-    private Button readingModeButton;
     private SwitchCompat readingRemindersSwitch;
     public static final String LAST_ACTIVE_TIME = "last active time";
     public static final String READING_REMINDERS_ENABLED = "reading reminders enabled";
     public static final String SHARED_PREFERENCES_NAME = "shared preferences";
     private SharedPreferences sharedPreferences;
-    public static int ALARM_REQUEST_CODE = 1;
+    public final static int ALARM_REQUEST_CODE = 1;
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     private ActivityResultLauncher<String> getNotificationPermission;
@@ -93,7 +92,7 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
     }
 
     private void initViews(View view){
-        readingModeButton = view.findViewById(R.id.readingModeButton);
+        Button readingModeButton = view.findViewById(R.id.readingModeButton);
         readingModeButton.setOnClickListener(this);
 
         readingRemindersSwitch = view.findViewById(R.id.readingRemindersSwitch);

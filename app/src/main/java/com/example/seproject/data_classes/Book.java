@@ -22,13 +22,9 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Book {
     private String bookID;
@@ -137,13 +133,7 @@ public class Book {
 
     private void getDefaultImage(Context context, BookImageReceiver receiver){
         // creates a bitmap of the default icon
-        Drawable drawable = AppCompatResources.getDrawable(context, R.drawable.baseline_book_75);
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        saveImage(context, bitmap, receiver);
+        saveImage(context, User.getBitmapFromDrawable(context, R.drawable.baseline_book_75), receiver);
     }
 
     // Called when the book image is set. If the book image finishes downloading after the book details
@@ -238,16 +228,20 @@ public class Book {
 
         getReviews().remove(review.getUid());
 
-        int pos = 0;
-        for (int i = 0; i < getOrderedReviews().size(); i++){
-            if (getOrderedReviews().get(i).getUid().equals(review.getUid())){
-                pos = i;
-                break;
-            }
-        }
+        int pos = findReviewUid(review.getUid());
         getOrderedReviews().remove(pos);
         return pos;
     }
+
+    public int findReviewUid(String uid){
+        for (int i = 0; i < getOrderedReviews().size(); i++){
+            if (getOrderedReviews().get(i).getUid().equals(uid)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private boolean containsUserReview(){
         return !getOrderedReviews().isEmpty() && getOrderedReviews().get(0).isCurrentUserReview();
     }
@@ -334,10 +328,6 @@ public class Book {
         return datePublished;
     }
 
-    public void setReviews(Map<String, Review> reviews) {
-
-        this.reviews = reviews;
-    }
 
 
     public Map<String, Review> getReviews() {

@@ -1,6 +1,5 @@
 package com.example.seproject.book_lists.async_tasks;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -12,12 +11,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class HTTPSearchForBooksTask extends AsyncTask<String, Void, String> {
-    public static interface SearchResultsReceiver{
-        abstract void getSearchResults(String result);
+    public interface SearchResultsReceiver{
+        void getSearchResults(String result);
     }
     public static class FailedToSearchBooksException extends RuntimeException{}
 
-    private SearchResultsReceiver parent;
+    private final SearchResultsReceiver parent;
 
     public HTTPSearchForBooksTask(SearchResultsReceiver parent){
         super();
@@ -31,7 +30,7 @@ public class HTTPSearchForBooksTask extends AsyncTask<String, Void, String> {
         HttpURLConnection apiConnection;
         try {
             URL urlGetRequest = new URL(urlString);
-            Log.d("SEProject", "Searching for url "+ urlGetRequest.toString());
+            Log.d("SEProject", "Searching for url "+ urlGetRequest);
             apiConnection = (HttpURLConnection) urlGetRequest.openConnection();
 
             int responseCode = apiConnection.getResponseCode();

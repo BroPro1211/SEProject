@@ -20,11 +20,11 @@ import java.util.List;
 
 public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyclerAdapter.BookListViewHolder> {
 
-    private List<BookList> data;
+    private final List<BookList> data;
 
     public static class BookListViewHolder extends ListRecyclerAdapter.ClickableViewHolder {
-        private TextView nameTV;
-        private TextView listSizeTV;
+        private final TextView nameTV;
+        private final TextView listSizeTV;
 
         public BookListViewHolder(@NonNull View itemView) {
             super(itemView);

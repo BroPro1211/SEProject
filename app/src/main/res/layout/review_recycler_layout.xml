@@ -8,14 +8,41 @@
     android:padding="5dp"
     >
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/imageCardView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
+        android:visibility="invisible"
 
+        app:cardCornerRadius="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/profileImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/baseline_person_gray_24" />
+
+    </androidx.cardview.widget.CardView>
+
+    <ProgressBar
+        android:id="@+id/imageProgressBar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageCardView"
+        app:layout_constraintEnd_toEndOf="@+id/imageCardView"
+        app:layout_constraintStart_toStartOf="@+id/imageCardView"
+        app:layout_constraintTop_toTopOf="@+id/imageCardView" />
     <TextView
         android:id="@+id/reviewUsernameTV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:layout_marginTop="2dp"
-
+        android:layout_marginStart="10dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="Username"
@@ -24,7 +51,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/deleteReviewButton"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageCardView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <RatingBar
@@ -82,4 +109,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/reviewDateTV" />
+
+    <ImageView
+        android:id="@+id/likeImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:src="@drawable/baseline_thumb_up_off_alt_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/reviewDescriptionV" />
+
+    <TextView
+        android:id="@+id/likesNumberTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:text="0"
+        android:textSize="17sp"
+        android:textColor="@color/dark_gray_text"
+
+        app:layout_constraintBottom_toBottomOf="@+id/likeImageView"
+        app:layout_constraintEnd_toStartOf="@+id/likeImageView"
+        app:layout_constraintTop_toTopOf="@+id/likeImageView"
+        android:layout_marginEnd="3dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

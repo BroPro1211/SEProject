@@ -23,13 +23,13 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
 
     // if adapter accessed from addBookFragment, field stores the listID a book should be added to
     // else is null
-    private String listID;
+    private final String listID;
 
     public static class BookViewHolder extends ListRecyclerAdapter.ClickableViewHolder {
-        private TextView titleTV;
-        private TextView authorTV;
-        private ImageView imageView;
-        private ProgressBar progressBar;
+        private final TextView titleTV;
+        private final TextView authorTV;
+        private final ImageView imageView;
+        private final ProgressBar progressBar;
 
 
         public BookViewHolder(@NonNull View itemView) {
