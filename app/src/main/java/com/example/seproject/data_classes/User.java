@@ -12,6 +12,7 @@ import com.example.seproject.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Exclude;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class User {
 
         bookLists.put(key, newBookList);
 
-        orderedBookLists.add(newBookList);
+        getOrderedBookLists().add(newBookList);
         Log.d("SEProject", "Added list at position " + (orderedBookLists.size()-1));
 
         FBref.FBUsers.child(uid).child(FBref.USER_BOOK_LISTS).child(key).setValue(newBookList);
@@ -112,6 +113,9 @@ public class User {
     }
 
     public static List<BookList> getOrderedBookLists(){
+
+        if (orderedBookLists == null)
+            orderedBookLists = new ArrayList<>();
         return orderedBookLists;
     }
 

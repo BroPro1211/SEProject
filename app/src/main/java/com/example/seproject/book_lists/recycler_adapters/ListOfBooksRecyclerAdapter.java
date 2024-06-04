@@ -98,7 +98,9 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
 
         holder.getTitleTV().setText(book.getTitle());
         holder.getAuthorTV().setText(book.getAuthor());
-
+        holder.getImageView().setImageBitmap(null);
+        holder.getImageView().setVisibility(View.INVISIBLE);
+        holder.getProgressBar().setVisibility(View.VISIBLE);
         book.getImage(fragment.getContext(), new Book.BookImageReceiver() {
             @Override
             public void receiveBookImage(Book book, Bitmap image) {

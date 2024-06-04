@@ -29,12 +29,14 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
     public static final String ARG_LIST_ID = "listID";
 
     private String listID;
+    private BookList bookList;
 
     private ProgressBar progressBar1;
     private ProgressBar progressBar2;
     private ProgressBar recyclerProgressBar;
     private ImageButton addToListButton;
     private ImageButton deleteFromListButton;
+
 
 
     public static final String ADD_BOOK_TAG = "add book tag";
@@ -56,7 +58,7 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
         if (listID == null)
             throw new RuntimeException("Attempted to open book list overview with no id provided");
 
-        BookList bookList = User.getCurrentUser().getBookLists().get(listID);
+        bookList = User.getCurrentUser().getBookLists().get(listID);
 
         TextView listNameTV = view.findViewById(R.id.listNameTV);
         listNameTV.setText(bookList.getName());
@@ -122,6 +124,9 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
 
     @Override
     public void onClickDeleteFromList() {
+        if (bookList.getBooks().isEmpty())
+            return;
+
         Log.d("SEProject", "Opening delete book dialog");
 
         DialogFragment deleteBookDialogFragment = DeleteBookDialogFragment.newInstance(listID);

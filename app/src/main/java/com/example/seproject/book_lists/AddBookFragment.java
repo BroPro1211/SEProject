@@ -149,7 +149,16 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
                 return;
             }
 
-            processResultsArray(jsonResults.getJSONArray(RESULTS_ARRAY));
+            requireActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        processResultsArray(jsonResults.getJSONArray(RESULTS_ARRAY));
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
 
 
 
@@ -163,7 +172,8 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
     private void processResultsArray(JSONArray resultsArray) throws JSONException {
         int size = resultsArray.length();
 
-        for (int i = recyclerBookList.size()-1; i >= 0; i--){
+
+        for (int i = recyclerBookList.size()-1; i >= 0 ; i--){
             recyclerBookList.remove(i);
             adapter.notifyItemRemoved(i);
         }

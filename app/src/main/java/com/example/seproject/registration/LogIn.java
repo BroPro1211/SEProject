@@ -134,6 +134,8 @@ public class LogIn extends AppCompatActivity {
                     Log.d("SEProject", "Successfully retrieved user data from FB");
                     User user = task.getResult().getValue(User.class);
 
+                    if (user == null)
+                        return;
 
                     String fileName = user.getUid() + FBref.IMAGE_FILE_EXTENSION;
                     StorageReference bookImageReference = FBref.FBUserImages.child(fileName);
@@ -182,7 +184,7 @@ public class LogIn extends AppCompatActivity {
         if (User.getCurrentUser().getProfileImage() == null){
             // set default image
 
-            User.getCurrentUser().setProfileImage(User.getBitmapFromDrawable(context, R.drawable.baseline_person_gray_24));
+            User.getCurrentUser().setProfileImage(User.getBitmapFromDrawable(context, R.drawable.baseline_person_gray_100));
         }
 
         Intent i = new Intent(context, MainActivity.class);
