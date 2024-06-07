@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.User;
@@ -23,6 +24,13 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
+
+/**
+ * @author		Daniel Bronfenbrener
+ * @version 1.0
+ * @since 04/06/2024
+ * The sign up screen
+ */
 public class SignUp extends AppCompatActivity {
     private EditText emailET;
     private EditText usernameET;
@@ -68,6 +76,9 @@ public class SignUp extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
     }
 
+    /**
+     * Gets user input and creates a new user for him
+     */
     private void signUp(){
         String email = emailET.getText().toString();
         String username = usernameET.getText().toString();
@@ -114,13 +125,12 @@ public class SignUp extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d("SEProject", "Successfully created user");
 
-
                             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
                             User user = new User(uid, username);
                             FBref.FBUsers.child(uid).setValue(user);
 
-                            User.setCurrentUser(user);
+                            MainActivity.setCurrentUser(user);
 
                             LogIn.enterApplication(getBaseContext(), thisActivity);
                         }

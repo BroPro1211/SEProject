@@ -12,14 +12,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.seproject.R;
 
-
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * An abstract class of a fragment that displays a recycle view with add and delete buttons
+ */
 public abstract class ListFragmentAddDelete<T> extends Fragment {
 
     protected RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter;
     protected RecyclerView recyclerView;
 
-
-    protected void initView(View view){
+    /**
+     * Initializes the add and delete buttons
+     * @param view The view of the fragment
+     */
+    protected void initButtons(View view){
         ImageButton addToListButton = view.findViewById(R.id.addToListButton);
         addToListButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,8 +45,6 @@ public abstract class ListFragmentAddDelete<T> extends Fragment {
             }
         });
 
-
-        recyclerView = view.findViewById(R.id.listRecyclerView);
     }
 
 

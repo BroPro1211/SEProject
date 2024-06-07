@@ -1,5 +1,10 @@
 package com.example.seproject.data_classes;
 
+import android.graphics.Bitmap;
+
+import androidx.annotation.NonNull;
+
+import com.example.seproject.MainActivity;
 import com.google.firebase.database.Exclude;
 
 import java.util.HashMap;
@@ -13,16 +18,17 @@ public class Review {
     private String reviewText;
     private long timeAdded;
     private String username;
-
     private Map<String, Boolean> userLikesMap;
+
+    private Bitmap userProfileImage;
 
 
     public Review(int starNum, String description){
         this.starNum = starNum;
         this.reviewText = description;
 
-        uid = User.getCurrentUser().getUid();
-        username = User.getCurrentUser().getUsername();
+        uid = MainActivity.getCurrentUser().getUid();
+        username = MainActivity.getCurrentUser().getUsername();
         timeAdded = System.currentTimeMillis();
 
         userLikesMap = new HashMap<>();
@@ -30,7 +36,16 @@ public class Review {
 
     @Exclude
     public boolean isCurrentUserReview(){
-        return User.getCurrentUser().getUid().equals(uid);
+        return MainActivity.getCurrentUser().getUid().equals(uid);
+    }
+
+    @Exclude
+    public Bitmap getUserProfileImage() {
+        return userProfileImage;
+    }
+    @Exclude
+    public void setUserProfileImage(Bitmap userProfileImage) {
+        this.userProfileImage = userProfileImage;
     }
 
 
@@ -54,7 +69,7 @@ public class Review {
     }
 
     public String getUsername(){return username;}
-
+    @NonNull
     public Map<String, Boolean> getUserLikesMap(){
         if (userLikesMap == null)
             userLikesMap = new HashMap<>();

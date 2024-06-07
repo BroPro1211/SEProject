@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
@@ -32,6 +33,12 @@ import com.example.seproject.R;
 import java.util.Calendar;
 
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Fragment that shows the tools features
+ */
 public class ToolsFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener{
     private SwitchCompat readingRemindersSwitch;
     public static final String LAST_ACTIVE_TIME = "last active time";
@@ -42,12 +49,11 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     private ActivityResultLauncher<String> getNotificationPermission;
-    private ActivityResultLauncher<Object> getDoNoDisturbPermission;
+    private ActivityResultLauncher<Intent> getDoNoDisturbPermission;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_tools, container, false);
 
         sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -68,29 +74,22 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
             }
         });
 
-        getDoNoDisturbPermission = registerForActivityResult(new ActivityResultContract<Object, Object>() {
-            @Override
-            public Object parseResult(int i, @Nullable Intent intent) {
-                return null;
-            }
+        getDoNoDisturbPermission = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult o) {
+                        openReadingMode();
+                    }
+                });
 
-            @NonNull
-            @Override
-            public Intent createIntent(@NonNull Context context, Object o) {
-                return new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-            }
-        }, new ActivityResultCallback<Object>() {
-            @Override
-            public void onActivityResult(Object o) {
-                openReadingMode();
-            }
-        });
-
-        initViews(view);
+                initViews(view);
 
         return view;
     }
 
+    /**
+     * Initializes the fragment's views
+     * @param view The view of the fragment
+     */
     private void initViews(View view){
         Button readingModeButton = view.findViewById(R.id.readingModeButton);
         readingModeButton.setOnClickListener(this);
@@ -107,15 +106,19 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
         NotificationManager notificationManager = (NotificationManager) requireActivity().getSystemService(Context.NOTIFICATION_SERVICE);
         if (!notificationManager.isNotificationPolicyAccessGranted()) {
             Toast.makeText(getContext(), "In order to use do not disturb, provide access to the app", Toast.LENGTH_LONG).show();
-            getDoNoDisturbPermission.launch(null);
+            getDoNoDisturbPermission.launch(new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS));
         }
         else
             openReadingMode();
 
     }
 
+    /**
+     * Opens the reading mode fragment
+     */
     private void openReadingMode(){
         Log.d("SEProject", "Opening reading mode");
+
         FragmentManager fragmentManager = getParentFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerView, ReadingModeFragment.class, null)
@@ -139,6 +142,9 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
 
     }
 
+    /**
+     * Enables reading reminders
+     */
     private void enableReadingReminders(){
         Log.d("SEProject", "Enabling reading reminders");
 
@@ -152,6 +158,11 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
 
         Log.d("SEProject", "Alarm manager set");
     }
+
+    /**
+     * Returns the time at which to trigger the reading reminders broadcast receiver
+     * @return The next time in milliseconds at which to start the broadcast receiver
+     */
     private long getTriggerTime(){
         // sets the trigger time to be at 9AM
         Calendar calendar = Calendar.getInstance();
@@ -169,6 +180,11 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
          */
 
     }
+
+    /**
+     * Returns the interval between calls to the broadcast receiver
+     * @return Returns the interval in milliseconds
+     */
     private long getIntervalTime(){
         return AlarmManager.INTERVAL_DAY;
 
@@ -181,6 +197,9 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
         */
     }
 
+    /**
+     * Disables reading reminders
+     */
     private void disableReadingReminders(){
         Log.d("SEProject", "Disabling reading reminders");
         sharedPreferences.edit()
@@ -190,6 +209,10 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
         alarmManager.cancel(pendingIntent);
     }
 
+    /**
+     * Updates the last time seen on the app
+     * @param sharedPreferences The shared preferences to store the last seen time
+     */
     public static void updateLastActiveTime(SharedPreferences sharedPreferences){
         if (sharedPreferences.getBoolean(ToolsFragment.READING_REMINDERS_ENABLED, false)){
             long currentTime = System.currentTimeMillis();

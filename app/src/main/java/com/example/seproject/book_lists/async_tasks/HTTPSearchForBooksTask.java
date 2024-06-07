@@ -10,14 +10,31 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * AsyncTask to get book search results from google books api
+ */
 public class HTTPSearchForBooksTask extends AsyncTask<String, Void, String> {
+    /**
+     * Interface for the parent fragment to call a method with the results
+     */
     public interface SearchResultsReceiver{
+        /**
+         * Method to call with the search results
+         * @param result Book search results
+         */
         void getSearchResults(String result);
     }
     public static class FailedToSearchBooksException extends RuntimeException{}
 
     private final SearchResultsReceiver parent;
 
+    /**
+     * Constructor for HTTPSearchForBooksTask
+     * @param parent Search results receiver to call when done
+     */
     public HTTPSearchForBooksTask(SearchResultsReceiver parent){
         super();
         this.parent = parent;
@@ -30,7 +47,6 @@ public class HTTPSearchForBooksTask extends AsyncTask<String, Void, String> {
         HttpURLConnection apiConnection;
         try {
             URL urlGetRequest = new URL(urlString);
-            Log.d("SEProject", "Searching for url "+ urlGetRequest);
             apiConnection = (HttpURLConnection) urlGetRequest.openConnection();
 
             int responseCode = apiConnection.getResponseCode();

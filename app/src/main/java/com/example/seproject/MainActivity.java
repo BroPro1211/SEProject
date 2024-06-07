@@ -1,31 +1,55 @@
 package com.example.seproject;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.seproject.book_lists.BookListsFragment;
+import com.example.seproject.data_classes.Book;
+import com.example.seproject.data_classes.BookList;
 import com.example.seproject.data_classes.User;
 import com.example.seproject.tools.ToolsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * The main activity, displaying the app
+ */
 public class MainActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener, FragmentManager.OnBackStackChangedListener{
+
     public static final int HOME_SCREEN_ID = R.id.booksMenu;
     public static final String HOME_SCREEN_TAG = "home";
     private FragmentManager fragmentManager;
     private BottomNavigationView navBar;
+    private static User loggedInUser;
+    private static List<BookList> orderedBookLists;
+    private static List<Book> currentlyViewedListOfBooks; // a list of the BookList currently being viewed
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        User.checkCurrentUser();
+        checkCurrentUser();
 
         navBar = findViewById(R.id.bottomNavigationView);
         navBar.getMenu().findItem(R.id.booksMenu).setChecked(true);
@@ -85,5 +109,83 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             Log.d("SEProject", "Navigating to fragment " + HOME_SCREEN_ID);
             navBar.getMenu().findItem(HOME_SCREEN_ID).setChecked(true);
         }
+    }
+
+    public static void setCurrentUser(User user){
+        loggedInUser = user;
+    }
+    public static User getCurrentUser(){
+        return loggedInUser;
+    }
+    public static void checkCurrentUser(){
+        if (loggedInUser == null)
+            throw new RuntimeException("No logged in user found");
+    }
+
+    /**
+     * Signs out the currently logged in user
+     */
+    public static void signOut(){
+        FirebaseAuth.getInstance().signOut();
+        setCurrentUser(null);
+        setCurrentlyViewedListOfBooks(null);
+        orderedBookLists = null;
+    }
+
+
+    /**
+     * Returns the book lists of the signed in user, ordered by their creation time
+     * @return The list of ordered book lists
+     */
+    @NonNull
+    public static List<BookList> getOrderedBookLists(){
+        if (orderedBookLists == null) {
+            // the book list id's created by firebase are ordered by creation time
+            if (getCurrentUser() == null)
+                orderedBookLists = new ArrayList<>();
+            else
+                orderedBookLists = getCurrentUser().getBookLists().entrySet()
+                        .stream()
+                        .sorted(Map.Entry.comparingByKey())
+                        .map(Map.Entry::getValue)
+                        .collect(Collectors.toList());
+        }
+        return orderedBookLists;
+    }
+
+
+    public static void setCurrentlyViewedListOfBooks(List<Book> listOfBooks){
+        currentlyViewedListOfBooks = listOfBooks;
+    }
+    @NonNull
+    public static List<Book> getCurrentlyViewedListOfBooks(){
+        if (currentlyViewedListOfBooks == null)
+            currentlyViewedListOfBooks = new ArrayList<>();
+        return currentlyViewedListOfBooks;
+    }
+    public static int findBookInCurrentlyViewed(String bookID){
+        for (int i = 0; i < getCurrentlyViewedListOfBooks().size(); i++){
+            if (getCurrentlyViewedListOfBooks().get(i).getBookID().equals(bookID)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
+    public static String shortenString(String s, int length){
+        if (s.length() <= length)
+            return s;
+        return s.substring(0, length) + "...";
+    }
+
+    public static Bitmap getBitmapFromDrawable(Context context, int drawableId){
+        Drawable drawable = AppCompatResources.getDrawable(context, drawableId);
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 }

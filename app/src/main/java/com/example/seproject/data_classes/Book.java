@@ -3,18 +3,16 @@ package com.example.seproject.data_classes;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.content.res.AppCompatResources;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
-import com.example.seproject.book_lists.async_tasks.LoadImageFromUrlTask;
+import com.example.seproject.book_lists.async_tasks.LoadBookImageFromUrlTask;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.Exclude;
@@ -62,15 +60,19 @@ public class Book {
         reviews = null;
     }
 
-
+    /**
+     * Downloads the book's image and calls the receiver with it
+     * @param context The context
+     * @param receiver The receiver to call
+     */
     @Exclude
     public void getImage(Context context, BookImageReceiver receiver){
         Log.d("SEProject", "Getting book image for id " + bookID);
 
         // checks if the image was already loaded
         if (bookImage != null){
-            receiver.receiveBookImage(this, bookImage);
             Log.d("SEProject", "Book image already on device");
+            receiver.receiveBookImage(this, bookImage);
         }
 
         // else, the image isn't loaded, and we download the image from the link or FB Storage
@@ -106,13 +108,12 @@ public class Book {
                 // else, we use the download link
                 else {
                     Log.d("SEProject", "Downloading book image from url " + imageLink);
-                    LoadImageFromUrlTask task = new LoadImageFromUrlTask(context, this, receiver);
+                    LoadBookImageFromUrlTask task = new LoadBookImageFromUrlTask(context, this, receiver);
                     try{
-                        // task downloads image, saves it to this.bookImage, calls the receiver and
-                        // updates the details ImageView and ProgressBar if present
+                        // task calls the saveImage method
                         task.execute(imageLink);
                     }
-                    catch (LoadImageFromUrlTask.FailedToLoadImageException e){
+                    catch (LoadBookImageFromUrlTask.FailedToLoadImageException e){
                         Log.d("SEProject", "Image download from " + imageLink + " failed, downloading default icon");
 
                         // if the task failed, the default book icon will be applied
@@ -131,13 +132,33 @@ public class Book {
 
     }
 
+    /**
+     * Interface to call when finishing loading the image
+     */
+    public interface BookImageReceiver{
+        /**
+         * Method to call when finished loading image
+         * @param book Book whose image was loaded
+         * @param image Image bitmap
+         */
+        void receiveBookImage(Book book, Bitmap image);
+    }
+    /**
+     * Sets the default image
+     * @param context The context
+     * @param receiver The receiver to call
+     */
     private void getDefaultImage(Context context, BookImageReceiver receiver){
         // creates a bitmap of the default icon
-        saveImage(context, User.getBitmapFromDrawable(context, R.drawable.baseline_book_75), receiver);
+        saveImage(context, MainActivity.getBitmapFromDrawable(context, R.drawable.baseline_book_75), receiver);
     }
 
-    // Called when the book image is set. If the book image finishes downloading after the book details
-    // page is opened, the image will be loaded there.
+    /**
+     * Saves the downloaded image
+     * @param context The context
+     * @param image The loaded image
+     * @param receiver The receiver to call
+     */
     public void saveImage(Context context, Bitmap image, BookImageReceiver receiver){
         if (image == null)
             getDefaultImage(context, receiver);
@@ -150,19 +171,8 @@ public class Book {
         setDetailsImage();
     }
 
-    @Exclude
-    public void setImage(ImageView imageView, ProgressBar progressBar){
-        if (bookImage == null)
-            return;
 
-        imageView.setImageBitmap(bookImage);
-        imageView.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.INVISIBLE);
-    }
 
-    public interface BookImageReceiver{
-        void receiveBookImage(Book book, Bitmap image);
-    }
 
     @Exclude
     public void setDetailsImage(){
@@ -172,7 +182,10 @@ public class Book {
             return;
 
         Log.d("SEProject", "Setting image in details page for book " + bookID);
-        setImage(detailsImageView, detailsProgressBar);
+        detailsImageView.setImageBitmap(bookImage);
+        detailsImageView.setVisibility(View.VISIBLE);
+        detailsProgressBar.setVisibility(View.INVISIBLE);
+
         detailsImageView = null;
         detailsProgressBar = null;
 
@@ -193,13 +206,18 @@ public class Book {
 
 
     @Exclude
+    @NonNull
     public List<Review> getOrderedReviews(){
         if (orderedReviews == null)
             orderedReviews = new ArrayList<>();
         return orderedReviews;
     }
 
-    // adds review and returns the position in orderedReviews to which it was added
+    /**
+     * Adds review
+     * @param review Review to add
+     * @return Position in orderedReviews to which review was added
+     */
     public int addReview(Review review){
         if (review == null)
             throw new RuntimeException("Attempted to add null review to book " + bookID);
@@ -219,7 +237,11 @@ public class Book {
             return 1;
         }
     }
-    // deletes review and returns the position in orderedReviews from which it was deleted
+    /**
+     * Deletes review
+     * @param review Review to delete
+     * @return Position in orderedReviews from which review was deleted
+     */
     public int deleteReview(Review review){
         if (review == null)
             throw new RuntimeException("Attempted to remove null review from book " + bookID);
@@ -233,6 +255,11 @@ public class Book {
         return pos;
     }
 
+    /**
+     * Finds the index of the review in the list
+     * @param uid Uid of the review to search for
+     * @return The index of the review, or -1 if not found
+     */
     public int findReviewUid(String uid){
         for (int i = 0; i < getOrderedReviews().size(); i++){
             if (getOrderedReviews().get(i).getUid().equals(uid)){
@@ -242,14 +269,28 @@ public class Book {
         return -1;
     }
 
+    /**
+     * Returns if book contains a review by the currently signed in user
+     * @return True if such a review exists, false otherwise
+     */
     private boolean containsUserReview(){
         return !getOrderedReviews().isEmpty() && getOrderedReviews().get(0).isCurrentUserReview();
     }
+
+    /**
+     * Clears all reviews
+     */
     public void clearReviews(){
         reviews = null;
         orderedReviews = null;
     }
 
+    /**
+     * Returns an appropriate description if s is empty
+     * @param s String to check if empty
+     * @param parameter The parameter
+     * @return Returns s if s is not empty, else returns a string desccribing that the parameter wasn't found
+     */
     private String getTextIfEmpty(String s, String parameter){
         if (s == null || s.length() == 0)
             return "Book " + parameter + " not found";
@@ -283,16 +324,16 @@ public class Book {
     }
 
 
-    private String shortenString(String s, int length){
-        if (s.length() <= length)
-            return s;
-        return s.substring(0, length) + "...";
-    }
+
     @Exclude
     public String getBookShortInfo(){
-        return shortenString(title, 15) + "\n" + shortenString(author, 15);
+        return MainActivity.shortenString(title, 15) + "\n" + MainActivity.shortenString(author, 15);
     }
 
+    @Exclude
+    public Bitmap getBookImage(){
+        return bookImage;
+    }
 
 
 
@@ -329,7 +370,7 @@ public class Book {
     }
 
 
-
+    @NonNull
     public Map<String, Review> getReviews() {
         if (reviews == null)
             reviews = new LinkedHashMap<>();

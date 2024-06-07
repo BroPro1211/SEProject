@@ -32,6 +32,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.storage.StorageReference;
 
+
+/**
+ * @author		Daniel Bronfenbrener
+ * @version 1.0
+ * @since 04/06/2024
+ * The log in screen, responsible for entering the application
+ */
 public class LogIn extends AppCompatActivity {
     private EditText emailET;
     private EditText passwordET;
@@ -73,6 +80,9 @@ public class LogIn extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
     }
 
+    /**
+     * Gets user input and logs him in to FirebaseAuth
+     */
     private void logIn(){
         String email = emailET.getText().toString();
         String password = passwordET.getText().toString();
@@ -99,7 +109,7 @@ public class LogIn extends AppCompatActivity {
         Activity thisActivity = this;
 
         Log.d("SEProject", "Attempting to log in");
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+        FBref.FBAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(thisActivity, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -119,10 +129,15 @@ public class LogIn extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Gets the logged in user's data from the FB database
+     * @param context The context
+     * @param activity The activity from which the method is called
+     */
     public static void getUserDataFromFB(Context context, Activity activity){
         Log.d("SEProject", "Attempting to retrieve user data from FB");
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser user = FBref.FBAuth.getCurrentUser();
         if (user == null)
             throw new RuntimeException("No logged in user found");
         String uid = user.getUid();
@@ -134,15 +149,20 @@ public class LogIn extends AppCompatActivity {
                     Log.d("SEProject", "Successfully retrieved user data from FB");
                     User user = task.getResult().getValue(User.class);
 
-                    if (user == null)
+                    if (user == null) {
+                        Log.d("SEProject", "User object retreived from FB is null");
+                        Toast.makeText(context, "Failed to retrieve user data", Toast.LENGTH_LONG).show();
+                        FBref.FBAuth.signOut();
                         return;
+                    }
 
+                    // gets user profile image
                     String fileName = user.getUid() + FBref.IMAGE_FILE_EXTENSION;
-                    StorageReference bookImageReference = FBref.FBUserImages.child(fileName);
+                    StorageReference userImageReference = FBref.FBUserImages.child(fileName);
                     Log.d("SEProject", "Downloading user profile image");
 
                     final long ONE_MEGABYTE = 1024 * 1024;
-                    bookImageReference.getBytes(ONE_MEGABYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+                    userImageReference.getBytes(ONE_MEGABYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
                         @Override
                         public void onComplete(@NonNull Task<byte[]> task) {
                             if (task.isSuccessful()){
@@ -155,7 +175,7 @@ public class LogIn extends AppCompatActivity {
                             else{
                                 Log.d("SEProject", "Profile image not found");
                             }
-                            User.setCurrentUser(user);
+                            MainActivity.setCurrentUser(user);
 
                             enterApplication(context, activity);
                         }
@@ -164,32 +184,36 @@ public class LogIn extends AppCompatActivity {
 
                 }
                 else {
-                    Toast.makeText(context, "Failed to retrieve user data", Toast.LENGTH_LONG).show();
                     Log.d("SEProject", "Failed to retrieve data from FB", task.getException());
-
-                    FirebaseAuth.getInstance().signOut();
+                    Toast.makeText(context, "Failed to retrieve user data", Toast.LENGTH_LONG).show();
+                    FBref.FBAuth.signOut();
                 }
             }
         });
     }
 
 
+
+    /**
+     * Enters the main activity, after user data has been brought to the client
+     * @param context The context
+     * @param activity The activity from which the method is called
+     */
     public static void enterApplication(Context context, Activity activity){
-        Log.d("SEProject", "User successfully logged in, navigating to main");
+        Log.d("SEProject", "User successfully logged in, navigating to main activity");
 
-        User.checkCurrentUser();
+        MainActivity.checkCurrentUser();
 
-        User.createOrderedBookLists();
-
-        if (User.getCurrentUser().getProfileImage() == null){
-            // set default image
-
-            User.getCurrentUser().setProfileImage(User.getBitmapFromDrawable(context, R.drawable.baseline_person_gray_100));
+        // set default image
+        if (MainActivity.getCurrentUser().getProfileImage() == null){
+            MainActivity.getCurrentUser().setProfileImage(MainActivity.getBitmapFromDrawable(context, R.drawable.baseline_person_gray_100));
         }
 
         Intent i = new Intent(context, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         activity.startActivity(i);
     }
+
+
 
 }

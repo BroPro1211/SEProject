@@ -11,19 +11,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.data_classes.User;
 import com.example.seproject.data_classes.Book;
 import com.example.seproject.book_lists.BookDetailsFragment;
 
-public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksRecyclerAdapter.BookViewHolder> {
+public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksRecyclerAdapter.BookViewHolder, Fragment> {
 
     // if adapter accessed from addBookFragment, field stores the listID a book should be added to
     // else is null
-    private final String listID;
+    private final String addBooksToListID;
 
     public static class BookViewHolder extends ListRecyclerAdapter.ClickableViewHolder {
         private final TextView titleTV;
@@ -56,9 +58,9 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
 
                     Bundle args = new Bundle();
                     args.putInt(BookDetailsFragment.ARG_BOOK_POSITION_IN_CURRENTLY_VIEWED_LIST, position);
-                    args.putString(BookDetailsFragment.ARG_LIST_ID, adapter.listID);
+                    args.putString(BookDetailsFragment.ARG_ADD_BOOKS_TO_LIST_ID, adapter.addBooksToListID);
 
-                    // adds the fragment on top so the search list isn't destroyed
+                    // adds the fragment on top so the add book search list isn't destroyed
                     fragmentManager.beginTransaction()
                             .add(R.id.fragmentContainerView, BookDetailsFragment.class, args)
                             .setReorderingAllowed(true)
@@ -79,10 +81,16 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
 
     }
 
-    public ListOfBooksRecyclerAdapter(Fragment fragment, String listID) {
+    /**
+     * Constructor for ListOfBooksRecyclerAdapter
+     * @param fragment The parent fragment
+     * @param addBooksToListID A BookList ID, to add the books to if clicked. If null, the books won't
+     *                         be added to a list.
+     */
+    public ListOfBooksRecyclerAdapter(Fragment fragment, @Nullable String addBooksToListID) {
         super(fragment);
 
-        this.listID = listID;
+        this.addBooksToListID = addBooksToListID;
     }
 
     @NonNull
@@ -94,23 +102,25 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
 
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
-        Book book = User.getCurrentlyViewedListOfBooks().get(position);
+        Book book = MainActivity.getCurrentlyViewedListOfBooks().get(position);
 
         holder.getTitleTV().setText(book.getTitle());
         holder.getAuthorTV().setText(book.getAuthor());
-        holder.getImageView().setImageBitmap(null);
-        holder.getImageView().setVisibility(View.INVISIBLE);
-        holder.getProgressBar().setVisibility(View.VISIBLE);
-        book.getImage(fragment.getContext(), new Book.BookImageReceiver() {
-            @Override
-            public void receiveBookImage(Book book, Bitmap image) {
-                book.setImage(holder.getImageView(), holder.getProgressBar());
-            }
-        });
+
+        if (book.getBookImage() == null) {
+            holder.getImageView().setVisibility(View.INVISIBLE);
+            holder.getProgressBar().setVisibility(View.VISIBLE);
+        }
+        else{
+            holder.getImageView().setVisibility(View.VISIBLE);
+            holder.getImageView().setImageBitmap(book.getBookImage());
+            holder.getProgressBar().setVisibility(View.GONE);
+        }
+
     }
 
     @Override
     public int getItemCount() {
-        return User.getCurrentlyViewedListOfBooks().size();
+        return MainActivity.getCurrentlyViewedListOfBooks().size();
     }
 }

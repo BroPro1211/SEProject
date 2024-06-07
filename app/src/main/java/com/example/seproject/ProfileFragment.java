@@ -100,13 +100,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
         emailTV.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
 
         TextView usernameTV = view.findViewById(R.id.usernameTV);
-        usernameTV.setText(User.getCurrentUser().getUsername());
+        usernameTV.setText(MainActivity.getCurrentUser().getUsername());
 
         Button signOutButton = view.findViewById(R.id.signOutButton);
         signOutButton.setOnClickListener(this);
 
         profileImage = view.findViewById(R.id.profileImageView);
-        Bitmap image = User.getCurrentUser().getProfileImage();
+        Bitmap image = MainActivity.getCurrentUser().getProfileImage();
         profileImage.setImageBitmap(image);
 
         ImageButton editProfileImage = view.findViewById(R.id.editProfileImage);
@@ -146,13 +146,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
 
 
     private void saveNewImage(Bitmap image){
-        User.getCurrentUser().setProfileImage(image);
+        MainActivity.getCurrentUser().setProfileImage(image);
         profileImage.setImageBitmap(image);
         uploadProfileImageToFB(image);
     }
 
     private void uploadProfileImageToFB(Bitmap image){
-        String uid = User.getCurrentUser().getUid();
+        String uid = MainActivity.getCurrentUser().getUid();
 
         String fileName = uid + FBref.IMAGE_FILE_EXTENSION;
 
@@ -178,7 +178,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        User.signOut();
+        MainActivity.signOut();
 
         Intent i = new Intent(getContext(), LogIn.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

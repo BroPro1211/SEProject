@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.book_lists.BookDetailsFragment;
 import com.example.seproject.data_classes.FBref;
@@ -31,7 +32,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerAdapter.ReviewViewHolder> {
+public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerAdapter.ReviewViewHolder, BookDetailsFragment> {
 
     private final List<Review> reviews;
 
@@ -73,7 +74,7 @@ public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerA
                     ReviewsRecyclerAdapter adapter = (ReviewsRecyclerAdapter)getBindingAdapter();
                     Review review = adapter.reviews.get(pos);
 
-                    if (review.getUserLikesMap().containsKey(User.getCurrentUser().getUid())){
+                    if (review.getUserLikesMap().containsKey(MainActivity.getCurrentUser().getUid())){
                         ((BookDetailsFragment)adapter.fragment).removeReviewLikeFromFB(pos);
                     }
                     else{
@@ -108,9 +109,13 @@ public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerA
 
             if (image != null)
                 profileImageView.setImageBitmap(image);
-            else {
-                profileImageView.setImageBitmap(User.getBitmapFromDrawable(context, R.drawable.baseline_person_gray_24));
-            }
+            else
+                profileImageView.setImageBitmap(MainActivity.getBitmapFromDrawable(context, R.drawable.baseline_person_gray_100));
+
+        }
+        public void hideProfileImage(){
+            imageProgressBar.setVisibility(View.VISIBLE);
+            imageCardView.setVisibility(View.INVISIBLE);
         }
 
         public ImageView getLikeImageView(){
@@ -138,7 +143,6 @@ public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerA
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         Review review = reviews.get(position);
-        Bitmap image = null;
 
         holder.getReviewUsernameTV().setText(review.getUsername());
         holder.getReviewStarsRatingBar().setRating(review.getStarNum());
@@ -162,12 +166,13 @@ public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerA
         }
 
         Map<String, Boolean> userLikesMap = review.getUserLikesMap();
-        if (userLikesMap.containsKey(User.getCurrentUser().getUid())){
-            holder.getLikeImageView().setImageBitmap(User.getBitmapFromDrawable(fragment.getContext(), R.drawable.baseline_thumb_up_24));
+        if (userLikesMap.containsKey(MainActivity.getCurrentUser().getUid())){
+            holder.getLikeImageView().setImageBitmap(MainActivity.getBitmapFromDrawable(fragment.getContext(), R.drawable.baseline_thumb_up_24));
         }
         else{
-            holder.getLikeImageView().setImageBitmap(User.getBitmapFromDrawable(fragment.getContext(), R.drawable.baseline_thumb_up_off_alt_24));
+            holder.getLikeImageView().setImageBitmap(MainActivity.getBitmapFromDrawable(fragment.getContext(), R.drawable.baseline_thumb_up_off_alt_24));
         }
+
         int size = userLikesMap.size();
         if (size == 0){
             holder.getLikesNumberTV().setVisibility(View.GONE);
@@ -177,9 +182,8 @@ public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerA
             holder.getLikesNumberTV().setText(String.valueOf(size));
         }
 
-
+        ImageButton deleteReviewButton = holder.getDeleteReviewButton();
         if (review.isCurrentUserReview()){
-            ImageButton deleteReviewButton = holder.getDeleteReviewButton();
             deleteReviewButton.setVisibility(View.VISIBLE);
             deleteReviewButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -187,39 +191,23 @@ public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerA
                     ((BookDetailsFragment)fragment).deleteUserReview();
                 }
             });
-
-            image = User.getCurrentUser().getProfileImage();
+        }
+        else{
+            deleteReviewButton.setVisibility(View.GONE);
         }
 
-        if (image != null){
-            holder.showProfileImage(fragment.getContext(), image);
-            return;
-        }
+        if (review.getUserProfileImage() == null)
+            holder.hideProfileImage();
+        else
+            holder.showProfileImage(fragment.getContext(), review.getUserProfileImage());
 
-        String fileName = review.getUid() + FBref.IMAGE_FILE_EXTENSION;
-        StorageReference bookImageReference = FBref.FBUserImages.child(fileName);
-        Log.d("SEProject", "Downloading user profile image");
-
-        final long ONE_MEGABYTE = 1024 * 1024;
-        bookImageReference.getBytes(ONE_MEGABYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
-            @Override
-            public void onComplete(@NonNull Task<byte[]> task) {
-                if (task.isSuccessful()){
-                    Log.d("SEProject", "Successfully downloaded image from FB");
-                    byte[] bytes = task.getResult();
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-                    holder.showProfileImage(fragment.getContext(), bitmap);
-                }
-                else{
-                    Log.d("SEProject", "Profile image not found");
-                    holder.showProfileImage(fragment.getContext(), null);
-                }
-
-            }
-        });
     }
 
+    /**
+     * Converts the time in milliseconds to a formatted date
+     * @param timeInMilliseconds Time in milliseconds
+     * @return Formatted date
+     */
     private String convertMillisecondsToDate(long timeInMilliseconds){
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeInMilliseconds);

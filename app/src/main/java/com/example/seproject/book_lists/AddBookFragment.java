@@ -1,7 +1,9 @@
 package com.example.seproject.book_lists;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,8 +18,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.book_lists.async_tasks.HTTPSearchForBooksTask;
+import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
 import com.example.seproject.data_classes.Book;
 import com.example.seproject.data_classes.User;
 import com.example.seproject.book_lists.recycler_adapters.ListOfBooksRecyclerAdapter;
@@ -29,6 +33,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Fragment to search for books to add to a list
+ */
 public class AddBookFragment extends Fragment implements View.OnClickListener, HTTPSearchForBooksTask.SearchResultsReceiver {
     public static final String ARG_LIST_ID = "listID";
 
@@ -39,7 +49,6 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
     private Button searchButton;
     private ProgressBar progressBar;
 
-    private List<Book> recyclerBookList;
 
     private RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter;
 
@@ -70,7 +79,6 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_book, container, false);
 
         if (listID == null)
@@ -81,6 +89,10 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
         return view;
     }
 
+    /**
+     * Initializes the fragment views
+     * @param view The view of the fragment
+     */
     private void initViews(View view){
         searchButton = view.findViewById(R.id.searchButton);
         searchButton.setOnClickListener(this);
@@ -90,20 +102,13 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
         searchTitleET = view.findViewById(R.id.searchTitleET);
         searchAuthorET = view.findViewById(R.id.searchAuthorET);
 
-        recyclerBookList = new ArrayList<>();
-        User.setCurrentlyViewedListOfBooks(recyclerBookList);
+        MainActivity.setCurrentlyViewedListOfBooks(new ArrayList<>());
 
         Log.d("SEProject", "Initializing adapter");
         RecyclerView recyclerView = view.findViewById(R.id.listRecyclerView);
         adapter = new ListOfBooksRecyclerAdapter(this, listID);
-        recyclerView.setAdapter(adapter);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                layoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
+        ListRecyclerAdapter.setAdapterToRecycler(adapter, recyclerView, getContext());
     }
 
     @Override
@@ -149,18 +154,8 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
                 return;
             }
 
-            requireActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        processResultsArray(jsonResults.getJSONArray(RESULTS_ARRAY));
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
 
-
+            processResultsArray(jsonResults.getJSONArray(RESULTS_ARRAY));
 
 
         } catch (JSONException e) {
@@ -173,11 +168,10 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
         int size = resultsArray.length();
 
 
-        for (int i = recyclerBookList.size()-1; i >= 0 ; i--){
-            recyclerBookList.remove(i);
+        for (int i = MainActivity.getCurrentlyViewedListOfBooks().size()-1; i >= 0 ; i--){
+            MainActivity.getCurrentlyViewedListOfBooks().remove(i);
             adapter.notifyItemRemoved(i);
         }
-
 
 
         for (int i = 0; i < size; i++){
@@ -205,8 +199,16 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
             if (imageLink.startsWith("http://"))
                 imageLink = SECURE_PREFIX + imageLink.substring(INSECURE_PREFIX.length());
 
-            recyclerBookList.add(new Book(id, title, author, description, genre, pageCount, datePublished, imageLink));
+            Book book = new Book(id, title, author, description, genre, pageCount, datePublished, imageLink);
+            MainActivity.getCurrentlyViewedListOfBooks().add(book);
             adapter.notifyItemInserted(i);
+
+            book.getImage(getContext(), new Book.BookImageReceiver() {
+                @Override
+                public void receiveBookImage(Book book, Bitmap image) {
+                    adapter.notifyItemChanged(MainActivity.findBookInCurrentlyViewed(book.getBookID()));
+                }
+            });
 
             Log.d("SEProject", "Added book " + title + ", " + author);
         }
@@ -215,17 +217,40 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
 
     }
 
+    /**
+     * Method to get property from json object, and return a default value if doesn't exist
+     * @param jsonObject Json object to get property from
+     * @param propertyName Name of property
+     * @param defaultVal The default value to return
+     * @return The property, or default value if doesn't exist
+     * @param <T> The type of the property
+     * @throws JSONException Json exception
+     */
     private <T> T getJSONProperty(JSONObject jsonObject, String propertyName, T defaultVal) throws JSONException {
         if (jsonObject == null || !jsonObject.has(propertyName))
             return defaultVal;
         return (T) jsonObject.get(propertyName);
     }
+
+    /**
+     * Method to get first entry from json array, and return a default value if doesn't exist
+     * @param jsonArray Json array to get entry from
+     * @param defaultVal The default value to return
+     * @return The entry, or default value if doesn't exist
+     * @param <T> The type of the entry
+     * @throws JSONException Json exception
+     */
     private <T> T getFirstJSONEntry(JSONArray jsonArray, T defaultVal) throws JSONException {
         if (jsonArray == null || jsonArray.length() == 0)
             return defaultVal;
         return (T) jsonArray.get(0);
     }
 
+    /**
+     * Returns the search url based on the user's input
+     * @return The search url. Null if both input fields are empty.
+     */
+    @Nullable
     private String getUrl() {
         final String BASE_URL = "https://www.googleapis.com/books/v1/volumes?q=";
         final String SEARCH_TITLE_KEYWORD = "intitle:";
@@ -275,6 +300,11 @@ public class AddBookFragment extends Fragment implements View.OnClickListener, H
         return urlString + FILTER_RESULTS;
     }
 
+    /**
+     * Formats the url by replacing spaces with pluses
+     * @param s The string to format
+     * @return The formatted url
+     */
     private String formatUrl(String s){
         return s.replace(' ', '+');
     }

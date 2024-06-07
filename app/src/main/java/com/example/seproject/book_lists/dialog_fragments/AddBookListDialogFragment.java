@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.book_lists.BookListsFragment;
 import com.example.seproject.data_classes.User;
@@ -40,7 +41,7 @@ public class AddBookListDialogFragment extends DialogFragment {
                             Toast.makeText(getContext(), "Enter list name to proceed", Toast.LENGTH_LONG).show();
                         else {
                             String description = listDescriptionET.getText().toString();
-                            User.getCurrentUser().addBookList(name, description);
+                            MainActivity.getCurrentUser().addBookList(name, description);
 
                             ((BookListsFragment)getParentFragment()).notifyAdapterItemInserted(-1);
                         }

@@ -19,6 +19,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Fragment that displays the reading mode tool
+ */
 public class ReadingModeFragment extends Fragment implements Runnable, View.OnClickListener{
     private TextView elapsedTimeTV;
     private int elapsedSeconds;
@@ -30,7 +36,6 @@ public class ReadingModeFragment extends Fragment implements Runnable, View.OnCl
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_reading_mode, container, false);
 
 
@@ -47,15 +52,14 @@ public class ReadingModeFragment extends Fragment implements Runnable, View.OnCl
 
 
         elapsedTimeTV = view.findViewById(R.id.elapsedTimeTV);
-        Button doneButton = view.findViewById(R.id.doneButton);
 
         elapsedSeconds = 0;
-
+        Button doneButton = view.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(this);
 
         scheduledExecutorService = Executors.newScheduledThreadPool(1);
         scheduledExecutorService.scheduleWithFixedDelay(this, 0, 1, TimeUnit.SECONDS);
-        Log.d("s", scheduledExecutorService.toString());
+
         return view;
 
     }
@@ -73,12 +77,17 @@ public class ReadingModeFragment extends Fragment implements Runnable, View.OnCl
                 elapsedSeconds++;
 
                 if (timeString.equals("99:59:59")){
-                    exitReadingMode();
+                    getParentFragmentManager().popBackStack();
                 }
             }
         });
     }
 
+    /**
+     * Formats the elapsed seconds into a string
+     * @param elapsedSeconds The number of elapsed seconds
+     * @return Returns the formatted string
+     */
     private String formatTime(int elapsedSeconds){
         int hours = elapsedSeconds / 3600;
         int minutes = (elapsedSeconds % 3600) / 60;
@@ -89,22 +98,16 @@ public class ReadingModeFragment extends Fragment implements Runnable, View.OnCl
 
     @Override
     public void onClick(View v) {
-        exitReadingMode();
-    }
-
-    private void exitReadingMode(){
-        scheduledExecutorService.shutdown();
-
-        if (notificationManager.isNotificationPolicyAccessGranted()) {
-            notificationManager.setInterruptionFilter(currentNotificationsFilter);
-        }
-
         getParentFragmentManager().popBackStack();
     }
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        scheduledExecutorService.shutdown();
+
         if (notificationManager.isNotificationPolicyAccessGranted())
             notificationManager.setInterruptionFilter(currentNotificationsFilter);
     }

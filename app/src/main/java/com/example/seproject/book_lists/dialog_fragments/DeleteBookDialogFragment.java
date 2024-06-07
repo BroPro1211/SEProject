@@ -11,6 +11,7 @@ import androidx.fragment.app.DialogFragment;
 
 import android.widget.Toast;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.book_lists.BookListOverviewFragment;
 import com.example.seproject.data_classes.Book;
 import com.example.seproject.data_classes.User;
@@ -20,8 +21,13 @@ public class DeleteBookDialogFragment extends DialogFragment implements DialogIn
     public static final String ARG_LIST_ID = "listID";
 
     private String listID;
-    private int deletedBook;
+    private int bookToDeletePos;
 
+    /**
+     * Creates a new instance of DeleteBookDialogFragment, passing the listID to delete from
+     * @param listID The list to delete from
+     * @return The new instance of DeleteBookDialogFragment
+     */
     public static DeleteBookDialogFragment newInstance(String listID) {
         DeleteBookDialogFragment fragment = new DeleteBookDialogFragment();
         Bundle args = new Bundle();
@@ -44,11 +50,11 @@ public class DeleteBookDialogFragment extends DialogFragment implements DialogIn
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 
-        String[] booksDescriptors = User.getCurrentlyViewedListOfBooks().stream()
+        String[] booksDescriptors = MainActivity.getCurrentlyViewedListOfBooks().stream()
                 .map(Book::getBookShortInfo)
                 .toArray(String[]::new);
 
-        deletedBook = -1;
+        bookToDeletePos = -1;
         builder.setTitle("Delete Book")
                 .setSingleChoiceItems(booksDescriptors, -1, this)
                 .setPositiveButton("Delete", this)
@@ -60,14 +66,14 @@ public class DeleteBookDialogFragment extends DialogFragment implements DialogIn
     @Override
     public void onClick(DialogInterface dialog, int id) {
         if (id == DialogInterface.BUTTON_POSITIVE){
-            if (deletedBook == -1)
+            if (bookToDeletePos == -1)
                 Toast.makeText(getContext(), "Select book to delete", Toast.LENGTH_LONG).show();
             else {
-                User.getCurrentUser().getBookLists().get(listID).deleteBook(deletedBook);
-                ((BookListOverviewFragment)getParentFragment()).notifyAdapterItemRemoved(deletedBook);
+                MainActivity.getCurrentUser().getBookLists().get(listID).deleteBook(bookToDeletePos);
+                ((BookListOverviewFragment)getParentFragment()).notifyAdapterItemRemoved(bookToDeletePos);
             }
         }
         else
-            deletedBook = id;
+            bookToDeletePos = id;
     }
 }

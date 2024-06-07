@@ -14,14 +14,20 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class LoadImageFromUrlTask extends AsyncTask<String, Void, Bitmap> {
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * AsyncTask to load the image of a book from a url
+ */
+public class LoadBookImageFromUrlTask extends AsyncTask<String, Void, Bitmap> {
     public static class FailedToLoadImageException extends RuntimeException{}
 
     private final Book book;
     private final Book.BookImageReceiver receiver;
     private final Context context;
 
-    public LoadImageFromUrlTask(Context context, Book book, Book.BookImageReceiver receiver) {
+    public LoadBookImageFromUrlTask(Context context, Book book, Book.BookImageReceiver receiver) {
         this.context = context;
         this.book = book;
         this.receiver = receiver;
@@ -40,15 +46,15 @@ public class LoadImageFromUrlTask extends AsyncTask<String, Void, Bitmap> {
             int responseCode = connection.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK){
                 Log.d("SEProject", "HTTP response code not OK: " + responseCode);
-                throw new LoadImageFromUrlTask.FailedToLoadImageException();
+                throw new LoadBookImageFromUrlTask.FailedToLoadImageException();
             }
 
         } catch (MalformedURLException e) {
             Log.d("SEProject", "MalformedURLException occurred for " + urlString, e);
-            throw new LoadImageFromUrlTask.FailedToLoadImageException();
+            throw new LoadBookImageFromUrlTask.FailedToLoadImageException();
         } catch (IOException e) {
             Log.d("SEProject", "IOException occurred for " + urlString, e);
-            throw new LoadImageFromUrlTask.FailedToLoadImageException();
+            throw new LoadBookImageFromUrlTask.FailedToLoadImageException();
         }
 
         Log.d("SEProject", "HTTP connection successfully established, getting image data");
@@ -61,7 +67,7 @@ public class LoadImageFromUrlTask extends AsyncTask<String, Void, Bitmap> {
 
         } catch (IOException e) {
             Log.d("SEProject", "IOException occurred for " + urlString, e);
-            throw new LoadImageFromUrlTask.FailedToLoadImageException();
+            throw new LoadBookImageFromUrlTask.FailedToLoadImageException();
         } finally {
             connection.disconnect();
         }

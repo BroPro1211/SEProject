@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.Review;
@@ -71,7 +72,7 @@ public class AddReviewDialogFragment extends DialogFragment {
                             Review review = new Review((int) rating, description);
 
                             FBref.FBBooks.child(bookID).child(FBref.BOOK_REVIEWS)
-                                    .child(User.getCurrentUser().getUid()).setValue(review);
+                                    .child(MainActivity.getCurrentUser().getUid()).setValue(review);
                         }
                     }
                 })

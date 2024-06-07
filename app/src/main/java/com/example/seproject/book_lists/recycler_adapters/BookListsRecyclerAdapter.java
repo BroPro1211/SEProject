@@ -13,12 +13,19 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.seproject.MainActivity;
 import com.example.seproject.R;
+import com.example.seproject.book_lists.BookListsFragment;
 import com.example.seproject.data_classes.BookList;
 import com.example.seproject.book_lists.BookListOverviewFragment;
 
 import java.util.List;
 
-public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyclerAdapter.BookListViewHolder> {
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * The adapter for the list of the user's book lists
+ */
+public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyclerAdapter.BookListViewHolder, BookListsFragment> {
 
     private final List<BookList> data;
 
@@ -56,19 +63,32 @@ public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyc
             };
         }
 
+        /**
+         * Returns the name text view
+         * @return The nameTV
+         */
         public TextView getNameTV() {
             return nameTV;
         }
+
+        /**
+         * Returns the list size text view
+         * @return The listSizeTV
+         */
         public TextView getListSizeTV() {
             return listSizeTV;
         }
     }
 
-
-    public BookListsRecyclerAdapter(List<BookList> bookLists, Fragment parentFragment){
+    /**
+     * Constructor for BookListsRecyclerAdapter
+     * @param bookLists The list of book lists to display
+     * @param parentFragment The
+     */
+    public BookListsRecyclerAdapter(List<BookList> bookLists, BookListsFragment parentFragment){
         super(parentFragment);
-        data = bookLists;
 
+        data = bookLists;
     }
 
     @NonNull
@@ -82,6 +102,7 @@ public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyc
     @Override
     public void onBindViewHolder(@NonNull BookListViewHolder holder, int position) {
         BookList bookList = data.get(position);
+
         holder.getNameTV().setText(bookList.getName());
         holder.getListSizeTV().setText(bookList.getBookCount() + " books");
 

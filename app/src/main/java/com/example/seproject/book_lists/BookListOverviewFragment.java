@@ -1,5 +1,6 @@
 package com.example.seproject.book_lists;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
@@ -13,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.book_lists.dialog_fragments.DeleteBookDialogFragment;
 import com.example.seproject.data_classes.Book;
@@ -25,6 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Fragment to display the contents of a book list
+ */
 public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implements BookList.OrderedBooksReceiver {
     public static final String ARG_LIST_ID = "listID";
 
@@ -37,9 +45,8 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
     private ImageButton addToListButton;
     private ImageButton deleteFromListButton;
 
-
-
     public static final String ADD_BOOK_TAG = "add book tag";
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,16 +59,16 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_book_list_overview, container, false);
 
         if (listID == null)
             throw new RuntimeException("Attempted to open book list overview with no id provided");
 
-        bookList = User.getCurrentUser().getBookLists().get(listID);
+        bookList = MainActivity.getCurrentUser().getBookLists().get(listID);
 
         TextView listNameTV = view.findViewById(R.id.listNameTV);
         listNameTV.setText(bookList.getName());
+
         TextView listDescriptionTV = view.findViewById(R.id.listDescriptionTV);
         String description = bookList.getDescription();
         if (description.length() != 0)
@@ -73,17 +80,21 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
 
         initView(view);
 
-        User.setCurrentlyViewedListOfBooks(new ArrayList<>());
         adapter = new ListOfBooksRecyclerAdapter(this, null);
+        recyclerView = view.findViewById(R.id.listRecyclerView);
+
         bookList.getOrderedBooks(this);
 
 
         return view;
     }
 
-    @Override
-    protected void initView(View view){
-        super.initView(view);
+    /**
+     * Initializes the fragment views
+     * @param view The view of the fragment
+     */
+    public void initView(View view){
+        initButtons(view);
 
         progressBar1 = view.findViewById(R.id.progressBar1);
         progressBar2 = view.findViewById(R.id.progressBar2);
@@ -96,9 +107,19 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
 
     @Override
     public void getOrderedBooks(List<Book> books) {
-        User.setCurrentlyViewedListOfBooks(books);
+        MainActivity.setCurrentlyViewedListOfBooks(books);
 
         ListRecyclerAdapter.setAdapterToRecycler(adapter, recyclerView, getContext());
+
+        // set listener on books to get images and update adapter
+        for (Book book : MainActivity.getCurrentlyViewedListOfBooks()){
+            book.getImage(getContext(), new Book.BookImageReceiver() {
+                @Override
+                public void receiveBookImage(Book book, Bitmap image) {
+                    adapter.notifyItemChanged(MainActivity.findBookInCurrentlyViewed(book.getBookID()));
+                }
+            });
+        }
 
         progressBar1.setVisibility(View.GONE);
         progressBar2.setVisibility(View.GONE);
@@ -110,6 +131,8 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
 
     @Override
     public void onClickAddToList() {
+        Log.d("SEProject", "Opening add book dialog");
+
         FragmentManager fragmentManager = getParentFragmentManager();
 
         Bundle args = new Bundle();
@@ -133,6 +156,10 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
         deleteBookDialogFragment.show(getChildFragmentManager(), "delete book");
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
-
+        MainActivity.setCurrentlyViewedListOfBooks(null);
+    }
 }

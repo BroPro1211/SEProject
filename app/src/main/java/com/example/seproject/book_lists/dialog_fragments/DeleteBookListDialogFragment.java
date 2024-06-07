@@ -11,6 +11,7 @@ import androidx.fragment.app.DialogFragment;
 
 import android.widget.Toast;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.book_lists.BookListsFragment;
 import com.example.seproject.data_classes.BookList;
 import com.example.seproject.data_classes.User;
@@ -28,7 +29,7 @@ public class DeleteBookListDialogFragment extends DialogFragment implements Dial
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 
-        bookLists = User.getOrderedBookLists();
+        bookLists = MainActivity.getOrderedBookLists();
         String[] listDescriptors = bookLists.stream()
                 .map(BookList::getListShortInfo)
                 .toArray(String[]::new);
@@ -48,7 +49,7 @@ public class DeleteBookListDialogFragment extends DialogFragment implements Dial
             if (deletedList == -1)
                 Toast.makeText(getContext(), "Select list to delete", Toast.LENGTH_LONG).show();
             else {
-                User.getCurrentUser().deleteBookList(bookLists.get(deletedList).getListID(), deletedList);
+                MainActivity.getCurrentUser().deleteBookList(bookLists.get(deletedList).getListID(), deletedList);
                 ((BookListsFragment)getParentFragment()).notifyAdapterItemRemoved(deletedList);
             }
         }

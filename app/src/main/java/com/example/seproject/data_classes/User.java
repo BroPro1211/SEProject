@@ -8,6 +8,7 @@ import android.util.Log;
 
 import androidx.appcompat.content.res.AppCompatResources;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Exclude;
@@ -19,16 +20,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class User {
-    private static User loggedInUser;
     private String uid;
     private String username;
     private Map<String, BookList> bookLists;
-    private static List<BookList> orderedBookLists;
-    // an ordering of the signed in user's book lists for the recycler view and delete list dialog
-
-    private static List<Book> currentlyViewedListOfBooks;
-    // an ordering of the current list of books that is being viewed, for the book list overview page
-    // and book search page
 
     private Bitmap profileImage;
 
@@ -48,6 +42,11 @@ public class User {
 
     }
 
+    /**
+     * Adds book list to user
+     * @param name Name of new list
+     * @param description Description of new list
+     */
     public void addBookList(String name, String description){
         String key = FBref.FBUsers.child(uid).child(FBref.USER_BOOK_LISTS).push().getKey();
 
@@ -55,8 +54,9 @@ public class User {
 
         bookLists.put(key, newBookList);
 
-        getOrderedBookLists().add(newBookList);
-        Log.d("SEProject", "Added list at position " + (orderedBookLists.size()-1));
+        MainActivity.getOrderedBookLists().add(newBookList);
+        Log.d("SEProject", "Added book list at position " + (MainActivity.getOrderedBookLists().size()-1));
+
 
         FBref.FBUsers.child(uid).child(FBref.USER_BOOK_LISTS).child(key).setValue(newBookList);
 
@@ -64,9 +64,14 @@ public class User {
 
     }
 
+    /**
+     * Deletes book list from usre
+     * @param id Id of book list to delete
+     * @param position Position of book list in the ordered list
+     */
     public void deleteBookList(String id, int position){
-        orderedBookLists.remove(position);
-        Log.d("SEProject", "Deleted list at position " + position);
+        MainActivity.getOrderedBookLists().remove(position);
+        Log.d("SEProject", "Deleted book list at position " + position);
 
         bookLists.remove(id);
 
@@ -81,43 +86,11 @@ public class User {
     }
 
 
-    public static void setCurrentUser(User user){
-        loggedInUser = user;
-    }
-    public static User getCurrentUser(){
-        return loggedInUser;
-    }
-    public static void checkCurrentUser(){
-        if (loggedInUser == null)
-            throw new RuntimeException("No logged in user found");
-    }
-    public static void signOut(){
-        FirebaseAuth.getInstance().signOut();
-        setCurrentUser(null);
-    }
-
-    public static void setCurrentlyViewedListOfBooks(List<Book> listOfBooks){
-        currentlyViewedListOfBooks = listOfBooks;
-    }
-    public static List<Book> getCurrentlyViewedListOfBooks(){
-        return currentlyViewedListOfBooks;
-    }
 
 
-    public static void createOrderedBookLists(){
-        orderedBookLists = User.getCurrentUser().bookLists.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList());
-    }
 
-    public static List<BookList> getOrderedBookLists(){
 
-        if (orderedBookLists == null)
-            orderedBookLists = new ArrayList<>();
-        return orderedBookLists;
-    }
+
 
     @Exclude
     public Bitmap getProfileImage(){
@@ -128,15 +101,6 @@ public class User {
         profileImage = image;
     }
 
-    public static Bitmap getBitmapFromDrawable(Context context, int drawableId){
-        Drawable drawable = AppCompatResources.getDrawable(context, drawableId);
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
-    }
 
 
     // FB required constructor and getters

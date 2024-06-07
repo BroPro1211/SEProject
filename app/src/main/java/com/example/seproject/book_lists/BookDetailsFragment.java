@@ -1,5 +1,7 @@
 package com.example.seproject.book_lists;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.book_lists.dialog_fragments.AddReviewDialogFragment;
 import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
@@ -27,18 +30,20 @@ import com.example.seproject.data_classes.BookList;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.Review;
 import com.example.seproject.data_classes.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-
+import com.google.firebase.storage.StorageReference;
 
 
 public class BookDetailsFragment extends Fragment implements View.OnClickListener,FetchBookFromFB.OnGetBook {
 
     public static final String ARG_BOOK_POSITION_IN_CURRENTLY_VIEWED_LIST = "book pos in currently viewed list";
-    public static final String ARG_LIST_ID = "list id";
+    public static final String ARG_ADD_BOOKS_TO_LIST_ID = "add books to list id";
 
     private Book book;
     private boolean alreadyInFB;
@@ -71,8 +76,9 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             int bookPos = getArguments().getInt(ARG_BOOK_POSITION_IN_CURRENTLY_VIEWED_LIST);
-            book = User.getCurrentlyViewedListOfBooks().get(bookPos);
-            addToListID = getArguments().getString(ARG_LIST_ID);
+            book = MainActivity.getCurrentlyViewedListOfBooks().get(bookPos);
+
+            addToListID = getArguments().getString(ARG_ADD_BOOKS_TO_LIST_ID);
             reviewsReference = FBref.FBBooks.child(book.getBookID()).child(FBref.BOOK_REVIEWS);
             reviewsListener = new ChildEventListener() {
                 @Override
@@ -88,9 +94,10 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
                     int pos = book.addReview(review);
                     totalStars += review.getStarNum();
 
-                    if (review.isCurrentUserReview()){
+                    if (review.isCurrentUserReview() && !addingToList()){
                         bookDetailsFAB.setVisibility(View.INVISIBLE);
                     }
+
 
                     if (! showingReviews()) {
                         initReviewList();
@@ -99,6 +106,32 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
                         adapter.notifyItemInserted(pos);
                         updateReviewsTVs();
                     }
+
+                    String fileName = review.getUid() + FBref.IMAGE_FILE_EXTENSION;
+                    StorageReference bookImageReference = FBref.FBUserImages.child(fileName);
+                    Log.d("SEProject", "Downloading user profile image");
+
+                    final long ONE_MEGABYTE = 1024 * 1024;
+                    bookImageReference.getBytes(ONE_MEGABYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+                        @Override
+                        public void onComplete(@NonNull Task<byte[]> task) {
+                            int pos = book.findReviewUid(review.getUid());
+                            if (task.isSuccessful()){
+                                Log.d("SEProject", "Successfully downloaded image from FB");
+                                byte[] bytes = task.getResult();
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+                                book.getOrderedReviews().get(pos).setUserProfileImage(bitmap);
+                            }
+                            else{
+                                Log.d("SEProject", "Profile image not found");
+                                book.getOrderedReviews().get(pos)
+                                        .setUserProfileImage(MainActivity.getBitmapFromDrawable(getContext(), R.drawable.baseline_person_gray_100));
+                            }
+                            adapter.notifyItemChanged(pos);
+
+                        }
+                    });
                 }
 
                 @Override
@@ -134,7 +167,7 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
                     int pos = book.deleteReview(review);
                     adapter.notifyItemRemoved(pos);
 
-                    if (review.isCurrentUserReview()){
+                    if (review.isCurrentUserReview() && ! addingToList()){
                         bookDetailsFAB.setVisibility(View.VISIBLE);
                     }
                     updateReviewsTVs();
@@ -175,7 +208,7 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
         String bookID = book.getBookID();
 
         if (addingToList()) {
-            bookList = User.getCurrentUser().getBookLists().get(addToListID);
+            bookList = MainActivity.getCurrentUser().getBookLists().get(addToListID);
 
             // checks if the book already exists in the list
             if (bookList.getBooks().containsKey(addToListID)){
@@ -206,13 +239,34 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
 
         return view;
     }
+    /**
+     * Initializes the fragment views
+     * @param view The view of the fragment
+     */
+    private void initViews(View view){
+        bookDetailsFAB = view.findViewById(R.id.bookDetailsFAB);
+        progressBarFAB = view.findViewById(R.id.progressBarFAB);
 
+        progressBarReviews = view.findViewById(R.id.progressBarReviews);
+        reviewsLayout = view.findViewById(R.id.reviewsLayout);
+
+        totalRatingBar = reviewsLayout.findViewById(R.id.totalRatingBar);
+        noReviewsTV = reviewsLayout.findViewById(R.id.noReviewsTV);
+        averageRatingTV = reviewsLayout.findViewById(R.id.averageRatingTV);
+        reviewsNumberTV = reviewsLayout.findViewById(R.id.reviewsNumberTV);
+        recyclerView = view.findViewById(R.id.reviewsRecyclerView);
+
+    }
+    /**
+     * Initializes the floating action button
+     */
     private void initFAB(){
         bookDetailsFAB.setVisibility(View.VISIBLE);
         bookDetailsFAB.setOnClickListener(this);
 
         progressBarFAB.setVisibility(View.INVISIBLE);
     }
+
     @Override
     public void onClick(View view) {
         if (addingToList()){
@@ -233,6 +287,10 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
 
     }
 
+    /**
+     * Fills in the book data
+     * @param view Fragment view
+     */
     private void fillInBookData(View view){
         Log.d("SEProject", "Filling in book data");
 
@@ -259,20 +317,7 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
 
         book.setDetailsImage();
     }
-    private void initViews(View view){
-        bookDetailsFAB = view.findViewById(R.id.bookDetailsFAB);
-        progressBarFAB = view.findViewById(R.id.progressBarFAB);
 
-        progressBarReviews = view.findViewById(R.id.progressBarReviews);
-        reviewsLayout = view.findViewById(R.id.reviewsLayout);
-
-        totalRatingBar = reviewsLayout.findViewById(R.id.totalRatingBar);
-        noReviewsTV = reviewsLayout.findViewById(R.id.noReviewsTV);
-        averageRatingTV = reviewsLayout.findViewById(R.id.averageRatingTV);
-        reviewsNumberTV = reviewsLayout.findViewById(R.id.reviewsNumberTV);
-        recyclerView = view.findViewById(R.id.reviewsRecyclerView);
-
-    }
 
 
     @Override
@@ -296,7 +341,9 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
         onException();
     }
 
-
+    /**
+     * If exception encountered, exits fragment
+     */
     private void onException(){
         Log.d("SEProject", "Encountered FB failure while displaying book " + book.getBookID());
         Toast.makeText(getContext(), "Encountered error", Toast.LENGTH_LONG).show();
@@ -304,7 +351,9 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
         getParentFragmentManager().popBackStack();
     }
 
-
+    /**
+     * Method initializes the reviews display
+     */
     private void startShowingReviews(){
 
         // set initial reviews screen to no reviews
@@ -317,11 +366,11 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
         // once a new child node is added
         reviewsReference.addChildEventListener(reviewsListener);
 
-
-
     }
 
-    // sets the review layout to show no reviews
+    /**
+     * Sets the review layout to show no reviews
+     */
     private void noBookReviews(){
         Log.d("SEProject", "Setting book " + book.getBookID() + " details screen to no reviews");
 
@@ -332,6 +381,10 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
         totalRatingBar.setRating(0);
         totalStars = 0;
     }
+
+    /**
+     * Closes the review list if all reviews were deleted
+     */
     private void closeReviewsList(){
         recyclerView.setVisibility(View.GONE);
         adapter = null;
@@ -341,9 +394,12 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
         reviewsNumberTV.setVisibility(View.GONE);
 
     }
-    // sets the review layout to show the book reviews
+
+    /**
+     * Sets the review layout to show the book reviews
+     */
     private void initReviewList(){
-        if (book.getReviews() == null || book.getReviews().isEmpty()){
+        if (book.getReviews().isEmpty()){
             Log.d("SEProject", "Attempting to initialize reviews list for " + book.getBookID() + " when reviews are empty");
             onException();
             return;
@@ -358,17 +414,19 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
         updateReviewsTVs();
     }
 
+    /**
+     * Updates the data shown in the reviews display
+     */
     private void updateReviewsTVs(){
-        if (book.getOrderedReviews().size() == 0){
+        if (book.getOrderedReviews().isEmpty()){
             return;
         }
-
 
         float averageRating = ((float)totalStars) / book.getReviews().size();
         totalRatingBar.setRating(averageRating);
 
         averageRatingTV.setVisibility(View.VISIBLE);
-        averageRatingTV.setText(String.valueOf(averageRating));
+        averageRatingTV.setText(String.format("%.1f",averageRating));
 
         reviewsNumberTV.setVisibility(View.VISIBLE);
         int num = book.getReviews().size();
@@ -381,32 +439,51 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
 
     }
 
+    /**
+     * Returns whether there are any reviews displayed
+     * @return True if there are reviews displayed, false otherwise
+     */
     private boolean showingReviews(){
         return adapter != null;
     }
 
-
+    /**
+     * Deletes the current user's review
+     */
     public void deleteUserReview(){
         FBref.FBBooks.child(book.getBookID()).child(FBref.BOOK_REVIEWS)
-                .child(User.getCurrentUser().getUid()).removeValue();
+                .child(MainActivity.getCurrentUser().getUid()).removeValue();
     }
 
+    /**
+     * Returns whether the book should be added to a list or is viewed from a list
+     * @return True if the book should be added to a list, false otherwise
+     */
     private boolean addingToList(){
         return addToListID != null;
     }
 
+    /**
+     * Removes like from a review
+     * @param pos Position of the review in the recycler view
+     */
     public void removeReviewLikeFromFB(int pos){
         String reviewUid = book.getOrderedReviews().get(pos).getUid();
 
         FBref.FBBooks.child(book.getBookID()).child(FBref.BOOK_REVIEWS)
-                .child(reviewUid).child(FBref.REVIEW_USER_LIKES_MAP).child(User.getCurrentUser().getUid())
+                .child(reviewUid).child(FBref.REVIEW_USER_LIKES_MAP).child(MainActivity.getCurrentUser().getUid())
                 .removeValue();
     }
+
+    /**
+     * Adds like to a review
+     * @param pos Position of the review in the recycler view
+     */
     public void addReviewLikeToFB(int pos){
         String reviewUid = book.getOrderedReviews().get(pos).getUid();
 
         FBref.FBBooks.child(book.getBookID()).child(FBref.BOOK_REVIEWS)
-                .child(reviewUid).child(FBref.REVIEW_USER_LIKES_MAP).child(User.getCurrentUser().getUid())
+                .child(reviewUid).child(FBref.REVIEW_USER_LIKES_MAP).child(MainActivity.getCurrentUser().getUid())
                 .setValue(true);
 
     }

@@ -10,15 +10,27 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 
+/**
+ * Class to get book information from firebase
+ */
 public class FetchBookFromFB implements OnCompleteListener<DataSnapshot> {
 
-
+    /**
+     * Interface to call when finished getting the book info
+     */
     public interface OnGetBook{
+        /**
+         * Method to call on success
+         * @param book Book from FB
+         */
         void onSuccess(Book book);
+
+        /**
+         * Method to call on failure
+         */
         void onFailure();
     }
 
-    public static class FailedToFetchBookException extends RuntimeException{}
 
     private final OnGetBook parent;
 

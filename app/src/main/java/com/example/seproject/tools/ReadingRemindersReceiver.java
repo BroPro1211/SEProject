@@ -13,6 +13,9 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
+/**
+ * Reading reminders broadcast receiver, that is called every day to check if a notification should be sent
+ */
 public class ReadingRemindersReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "1";
     private static final String CHANNEL_NAME = "Reading reminders";
@@ -45,6 +48,11 @@ public class ReadingRemindersReceiver extends BroadcastReceiver {
 
     }
 
+    /**
+     * Returns whether a notification should be sent
+     * @param timeDiff The time difference between the current time to the last seen time
+     * @return Returns true if a notification should be sent, and false otherwise
+     */
     private boolean needToSendReminder(long timeDiff){
         long daysPassed = timeDiff / (1000*60*60*24);
         return daysPassed == 3 || daysPassed % 7 == 0;
@@ -58,7 +66,10 @@ public class ReadingRemindersReceiver extends BroadcastReceiver {
 
     }
 
-
+    /**
+     * Initializes the notification manager
+     * @param context The context
+     */
     private void initNotificationManager(Context context){
         Log.d("SEProject", "Initializing notification manager");
 
@@ -68,7 +79,11 @@ public class ReadingRemindersReceiver extends BroadcastReceiver {
         notificationManager.createNotificationChannel(channel);
     }
 
-
+    /**
+     * Sends a reminder notification
+     * @param context The context
+     * @param timeDiff The time difference between the current time to the last seen time
+     */
     private void sendNotification(Context context, long timeDiff){
 
         NotificationCompat.Builder notificationBbuilder = new
@@ -86,6 +101,11 @@ public class ReadingRemindersReceiver extends BroadcastReceiver {
             Log.d("SEProject", "Couldn't send notification, permission not granted");
     }
 
+    /**
+     * Returns the notification text
+     * @param timeDiff The time difference between the current time to the last seen time
+     * @return Returns a string of the text
+     */
     private String getNotificationText(long timeDiff){
         long daysPassed = timeDiff / (1000*60*60*24);
 
