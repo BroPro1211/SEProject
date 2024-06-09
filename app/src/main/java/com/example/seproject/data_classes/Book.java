@@ -24,6 +24,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Class to store the information about a book
+ */
 public class Book {
     private String bookID;
     private String title;
@@ -44,8 +51,17 @@ public class Book {
     private ImageView detailsImageView;
 
 
-
-
+    /**
+     * Initializes the book instance
+     * @param bookID The book's id
+     * @param title The book's title
+     * @param author The book's author
+     * @param description The book's description
+     * @param genre The book's genre
+     * @param pageCount The book's page count
+     * @param datePublished The date the book was published
+     * @param imageLink The link to the book's image. Is IMAGE_IN_FIREBASE_STORAGE if the image is already stored in firebase.
+     */
     public Book(String bookID, String title, String author, String description, String genre, int pageCount, String datePublished, String imageLink) {
         if (Arrays.asList(bookID, title, author, description, genre, imageLink).contains(null))
             throw new RuntimeException("Book cannot have null field");
@@ -61,7 +77,7 @@ public class Book {
     }
 
     /**
-     * Downloads the book's image and calls the receiver with it
+     * Downloads the book's image and calls the receiver with it. If no image found, calls with the default book image.
      * @param context The context
      * @param receiver The receiver to call
      */
@@ -85,8 +101,7 @@ public class Book {
                     String fileName = bookID + FBref.IMAGE_FILE_EXTENSION;
                     StorageReference bookImageReference = FBref.FBBookImages.child(fileName);
 
-                    final long ONE_MEGABYTE = 1024 * 1024;
-                    bookImageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    bookImageReference.getBytes(FBref.MAX_IMAGE_BYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
                             Log.d("SEProject", "Successfully downloaded image from FB");
@@ -144,7 +159,7 @@ public class Book {
         void receiveBookImage(Book book, Bitmap image);
     }
     /**
-     * Sets the default image
+     * Returns the default book image
      * @param context The context
      * @param receiver The receiver to call
      */
@@ -154,7 +169,7 @@ public class Book {
     }
 
     /**
-     * Saves the downloaded image
+     * Returns the downloaded image and saves it to this book
      * @param context The context
      * @param image The loaded image
      * @param receiver The receiver to call
@@ -171,9 +186,9 @@ public class Book {
         setDetailsImage();
     }
 
-
-
-
+    /**
+     * Sets the image to the saved book details fragment views
+     */
     @Exclude
     public void setDetailsImage(){
         if (bookImage == null)
@@ -190,21 +205,37 @@ public class Book {
         detailsProgressBar = null;
 
     }
+
+    /**
+     * Sets the book details fragment progress bar
+     * @param progressBar The details progress bar
+     */
     @Exclude
     public void setDetailsProgressBar(ProgressBar progressBar){
         this.detailsProgressBar = progressBar;
     }
+    /**
+     * Sets the book details fragment image view
+     * @param imageView The details image view
+     */
     @Exclude
     public void setDetailsImageView(ImageView imageView){
         this.detailsImageView = imageView;
     }
 
+    /**
+     * Sets the link to the book's image
+     * @param imageLink The link to the book's image
+     */
     @Exclude
     public void setImageLink(String imageLink){
         this.imageLink = imageLink;
     }
 
-
+    /**
+     * Returns a list of the book's reviews. If empty, initializes to an empty list.
+     * @return The list of reviews
+     */
     @Exclude
     @NonNull
     public List<Review> getOrderedReviews(){
@@ -214,7 +245,7 @@ public class Book {
     }
 
     /**
-     * Adds review
+     * Adds review to the book
      * @param review Review to add
      * @return Position in orderedReviews to which review was added
      */
@@ -238,7 +269,7 @@ public class Book {
         }
     }
     /**
-     * Deletes review
+     * Deletes review from the book
      * @param review Review to delete
      * @return Position in orderedReviews from which review was deleted
      */
@@ -289,47 +320,79 @@ public class Book {
      * Returns an appropriate description if s is empty
      * @param s String to check if empty
      * @param parameter The parameter
-     * @return Returns s if s is not empty, else returns a string desccribing that the parameter wasn't found
+     * @return Returns s if s is not empty, else returns a string describing that the parameter wasn't found
      */
-    private String getTextIfEmpty(String s, String parameter){
+    private static String getTextIfEmpty(String s, String parameter){
         if (s == null || s.length() == 0)
             return "Book " + parameter + " not found";
         return s;
     }
+
+    /**
+     * Returns the title to display
+     * @return The display title
+     */
     @Exclude
     public String getDisplayTitle(){
         return getTextIfEmpty(title, "title");
     }
+    /**
+     * Returns the author to display
+     * @return The display author
+     */
     @Exclude
     public String getDisplayAuthor(){
         return getTextIfEmpty(author, "author");
     }
+    /**
+     * Returns the description to display
+     * @return The display description
+     */
     @Exclude
     public String getDisplayDescription(){
         return getTextIfEmpty(description, "description");
     }
+    /**
+     * Returns the genre to display
+     * @return The display genre
+     */
     @Exclude
     public String getDisplayGenre(){
         return getTextIfEmpty(genre, "genre");
     }
+    /**
+     * Returns the page count to display
+     * @return The display page count
+     */
     @Exclude
     public String getDisplayPageCount(){
         if (pageCount == 0)
             return "Book page count not found";
         return String.valueOf(pageCount);
     }
+    /**
+     * Returns the date published to display
+     * @return The display date published
+     */
     @Exclude
     public String getDisplayDatePublished(){
         return getTextIfEmpty(datePublished, "date published");
     }
 
 
-
+    /**
+     * Returns short info about the book, showing the book title and author
+     * @return A string of the short info
+     */
     @Exclude
     public String getBookShortInfo(){
         return MainActivity.shortenString(title, 15) + "\n" + MainActivity.shortenString(author, 15);
     }
 
+    /**
+     * Returns the book's saved image
+     * @return A bitmap of the book's image
+     */
     @Exclude
     public Bitmap getBookImage(){
         return bookImage;
@@ -337,39 +400,76 @@ public class Book {
 
 
 
+
+    // FB required constructor and getters
+
+    /**
+     * Empty constructor
+     */
     public Book(){
 
     }
 
+    /**
+     * Returns the book's id
+     * @return The book id
+     */
     public String getBookID() {
         return bookID;
     }
 
+    /**
+     * Returns the book's title
+     * @return The book title
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Returns the book's author
+     * @return The book author
+     */
     public String getAuthor() {
         return author;
     }
 
+    /**
+     * Returns the book's description
+     * @return The book description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Returns the book's genre
+     * @return The book genre
+     */
     public String getGenre() {
         return genre;
     }
 
+    /**
+     * Returns the book's page count
+     * @return The book page count
+     */
     public int getPageCount() {
         return pageCount;
     }
 
+    /**
+     * Returns the book's date of publication
+     * @return The book date of publication
+     */
     public String getDatePublished() {
         return datePublished;
     }
 
-
+    /**
+     * Returns the book's map of reviews. If empty, initializes it to an empty map.
+     * @return The book map of reviews.
+     */
     @NonNull
     public Map<String, Review> getReviews() {
         if (reviews == null)

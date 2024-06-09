@@ -5,8 +5,6 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -23,7 +21,6 @@ import com.example.seproject.R;
 import com.example.seproject.book_lists.async_tasks.HTTPSearchForBooksTask;
 import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
 import com.example.seproject.data_classes.Book;
-import com.example.seproject.data_classes.User;
 import com.example.seproject.book_lists.recycler_adapters.ListOfBooksRecyclerAdapter;
 
 import org.json.JSONArray;
@@ -31,7 +28,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author		Daniel Bronfenbrener

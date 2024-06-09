@@ -4,11 +4,9 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentManager;
 
 import com.example.seproject.MainActivity;
 import com.example.seproject.book_lists.BookDetailsFragment;
-import com.example.seproject.book_lists.BookListOverviewFragment;
 import com.example.seproject.book_lists.FetchBookFromFB;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -22,18 +20,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
-public class BookList implements FetchBookFromFB.OnGetBook {
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Class to store the information about a user's book list
+ */
+public class BookList {
 
     private String listID;
     private String name;
     private String description;
     private List<Book> orderedBooks;
-    private Book bookToAdd;
     private Map<String, Boolean> books;
-    private OrderedBooksReceiver receiver;
 
-
+    /**
+     * Initializes the book list instance
+     * @param listID The list's id
+     * @param name The list's name
+     * @param description The list's description
+     */
     public BookList(String listID, String name, String description){
         if (listID == null || name == null || description == null || listID.length() == 0 || name.length() == 0)
             throw new IllegalArgumentException("Illegal book list arguments");
@@ -45,7 +51,7 @@ public class BookList implements FetchBookFromFB.OnGetBook {
     }
 
     /**
-     * Get the book list name shortened
+     * Get the shortened book list name
      * @return A string of the shortened name
      */
     private String getShortenedName(){
@@ -53,7 +59,7 @@ public class BookList implements FetchBookFromFB.OnGetBook {
     }
 
     /**
-     * Returns short info about the book list
+     * Returns short info about the book list, showing the list name and number of books
      * @return A string of the short info
      */
     @Exclude
@@ -70,16 +76,13 @@ public class BookList implements FetchBookFromFB.OnGetBook {
         return getBooks().size();
     }
 
-
-
-    @Exclude
-    public void setBookToAdd(Book book){
-        if (book == null)
-            throw new RuntimeException("Can't add book that is null");
-        bookToAdd = book;
-    }
-
-    public void addBook(BookDetailsFragment fragment, boolean alreadyInFB) {
+    /**
+     * Adds the given book to the book list
+     * @param bookToAdd The book to add
+     * @param fragment The BookDetailsFragment who called this method
+     * @param alreadyInFB A boolean value, describing if the book was already found to be in the database
+     */
+    public void addBook(final Book bookToAdd, BookDetailsFragment fragment, boolean alreadyInFB) {
         String bookID = bookToAdd.getBookID();
         Log.d("SEProject", "Adding book " + bookID + " to " + listID);
 
@@ -87,23 +90,22 @@ public class BookList implements FetchBookFromFB.OnGetBook {
             throw new RuntimeException("List already contains book");
 
         if (alreadyInFB){
-            addExistingBook(fragment);
+            addExistingBook(bookToAdd, fragment);
         }
         else{
             FetchBookFromFB fetchBook = new FetchBookFromFB(new FetchBookFromFB.OnGetBook() {
                 @Override
                 public void onSuccess(Book book) {
                     if (book == null) {
-                        addNewBookToFB(fragment);
+                        addNewBookToFB(bookToAdd, fragment);
                     }
                     else {
-                        addExistingBook(fragment);
+                        addExistingBook(book, fragment);
                     }
                 }
 
                 @Override
                 public void onFailure() {
-                    bookToAdd = null;
                     throw new FailedToFetchBookException();
                 }
             });
@@ -118,10 +120,11 @@ public class BookList implements FetchBookFromFB.OnGetBook {
     public static class FailedToFetchBookException extends RuntimeException{}
 
     /**
-     * Adds book to FB
+     * Adds the given book to the database (in the books subtree)
+     * @param bookToAdd The book to add
      * @param fragment The fragment
      */
-    private void addNewBookToFB(BookDetailsFragment fragment){
+    private void addNewBookToFB(Book bookToAdd, BookDetailsFragment fragment){
         String bookID = bookToAdd.getBookID();
         Log.d("SEProject", "Adding book " + bookID + " to FB in list " + listID);
 
@@ -132,6 +135,7 @@ public class BookList implements FetchBookFromFB.OnGetBook {
         bookToAdd.getImage(fragment.getContext(), new Book.BookImageReceiver() {
             @Override
             public void receiveBookImage(Book book, Bitmap image) {
+
                 String fileName = book.getBookID() + FBref.IMAGE_FILE_EXTENSION;
 
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -155,14 +159,15 @@ public class BookList implements FetchBookFromFB.OnGetBook {
             }
         });
 
-        addExistingBook(fragment);
+        addExistingBook(bookToAdd, fragment);
     }
 
     /**
-     * Adds book to client
+     * Adds the given book to the user
+     * @param bookToAdd The book to add
      * @param fragment The fragment
      */
-    private void addExistingBook(BookDetailsFragment fragment){
+    private void addExistingBook(Book bookToAdd, BookDetailsFragment fragment){
         Log.d("SEProject", "Adding book " + bookToAdd.getBookID() + " to client in list " + listID);
         String bookID = bookToAdd.getBookID();
         FBref.FBUsers.child(MainActivity.getCurrentUser().getUid()).child(FBref.USER_BOOK_LISTS).child(listID)
@@ -174,14 +179,13 @@ public class BookList implements FetchBookFromFB.OnGetBook {
             orderedBooks.add(bookToAdd);
         Log.d("SEProject", "Successfully added book " + bookToAdd.getBookID() + " to list " + listID);
 
-        bookToAdd = null;
 
-        fragment.getParentFragmentManager().popBackStack(BookListOverviewFragment.ADD_BOOK_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fragment.onAddedBook();
 
     }
     /**
-     * Deletes book
-     * @param position Position of book in list to delete
+     * Deletes book from the book list
+     * @param position Position of book in the ordered books list to delete
      */
     public void deleteBook(int position){
         String bookID = orderedBooks.get(position).getBookID();
@@ -215,24 +219,12 @@ public class BookList implements FetchBookFromFB.OnGetBook {
      * @param receiver A receiver that gets the list
      */
     private void createOrderedBooks(OrderedBooksReceiver receiver){
-        this.receiver = receiver;
         Log.d("SEProject", "Creating ordered books for list " + listID);
-        orderedBooks = new ArrayList<>();
-        List<String> booksIDs = new ArrayList<>(getBooks().keySet());
 
-        if (booksIDs.size() == 0) {
-            receiver.getOrderedBooks(orderedBooks);
-            return;
-        }
-
-        for (int i = 0; i < booksIDs.size(); i++){
-            String bookID = booksIDs.get(i);
-
-            FetchBookFromFB fetchBook = new FetchBookFromFB(this);
-            fetchBook.getBookFromFB(bookID);
-        }
-
+        OrderedBooksCreator orderedBooksCreator = new OrderedBooksCreator(this, receiver);
+        orderedBooksCreator.createOrderedBooks();
     }
+
     /**
      * An interface to call when the ordered books list creation is done
      */
@@ -241,27 +233,84 @@ public class BookList implements FetchBookFromFB.OnGetBook {
          * Method to call with the list of books
          * @param books The list of books
          */
-        void getOrderedBooks(List<Book> books);
+        void getOrderedBooks(@NonNull List<Book> books);
     }
 
-    @Override
-    public void onSuccess(Book book) {
-        if (book == null)
-            throw new FailedToFetchBookException();
+    /**
+     * Sets the ordered books list
+     * @param orderedBooks The list of books to store
+     */
+    @Exclude
+    public void setOrderedBooks(List<Book> orderedBooks){
+        this.orderedBooks = orderedBooks;
+    }
 
-        book.setImageLink(Book.IMAGE_IN_FIREBASE_STORAGE);
+    /**
+     * A class that creates the ordered books list
+     */
+    private static class OrderedBooksCreator implements FetchBookFromFB.OnGetBook{
+        private final BookList bookList;
+        private final OrderedBooksReceiver orderedBooksReceiver;
+        private final List<Book> orderedBooks;
 
-        orderedBooks.add(book);
-
-        if (orderedBooks.size() == getBooks().size()) {
-            Log.d("SEProject", "Finished creating ordered books");
-            receiver.getOrderedBooks(orderedBooks);
-            receiver = null;
+        /**
+         * Initializes the OrderedBooksCreator instance
+         * @param bookList The book list to create the ordered books for
+         * @param receiver The receiver to call when done
+         */
+        public OrderedBooksCreator(BookList bookList, OrderedBooksReceiver receiver) {
+            this.bookList = bookList;
+            orderedBooksReceiver = receiver;
+            orderedBooks = new ArrayList<>();
         }
-    }
-    @Override
-    public void onFailure() {
-        throw new FailedToFetchBookException();
+
+        /**
+         * Creates the ordered books list, saves it to the book list and calls the receiver when done
+         */
+        public void createOrderedBooks(){
+            List<String> booksIDs = new ArrayList<>(bookList.getBooks().keySet());
+
+            if (booksIDs.size() == 0) {
+                sendOrderedBooks();
+                return;
+            }
+
+            for (int i = 0; i < booksIDs.size(); i++){
+                String bookID = booksIDs.get(i);
+
+                FetchBookFromFB fetchBook = new FetchBookFromFB(this);
+                fetchBook.getBookFromFB(bookID);
+            }
+        }
+
+        /**
+         * Saves the ordered books to the book list and calls the receiver
+         */
+        private void sendOrderedBooks(){
+            bookList.setOrderedBooks(orderedBooks);
+            orderedBooksReceiver.getOrderedBooks(orderedBooks);
+        }
+
+        @Override
+        public void onSuccess(Book book) {
+            if (book == null)
+                throw new FailedToFetchBookException();
+
+            book.setImageLink(Book.IMAGE_IN_FIREBASE_STORAGE);
+
+            orderedBooks.add(book);
+
+            if (orderedBooks.size() == bookList.getBooks().size()) {
+                Log.d("SEProject", "Finished creating ordered books");
+                sendOrderedBooks();
+            }
+        }
+        @Override
+        public void onFailure() {
+            throw new FailedToFetchBookException();
+        }
+
+
     }
 
 
@@ -269,17 +318,40 @@ public class BookList implements FetchBookFromFB.OnGetBook {
 
 
     // FB required constructor and getters
+
+    /**
+     * Empty constructor
+     */
     public BookList(){}
 
+    /**
+     * Returns the list ID
+     * @return The list ID
+     */
     public String getListID() {
         return listID;
     }
+
+    /**
+     * Returns the list name
+     * @return The list name
+     */
     public String getName() {
         return name;
     }
+
+    /**
+     * Returns the list description
+     * @return The list description
+     */
     public String getDescription() {
         return description;
     }
+
+    /**
+     * Returns the list map of books
+     * @return The map of book ID's
+     */
     @NonNull
     public Map<String,Boolean> getBooks(){
         if (books == null){

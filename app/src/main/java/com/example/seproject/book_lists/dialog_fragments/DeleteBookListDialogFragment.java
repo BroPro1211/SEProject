@@ -14,14 +14,16 @@ import android.widget.Toast;
 import com.example.seproject.MainActivity;
 import com.example.seproject.book_lists.BookListsFragment;
 import com.example.seproject.data_classes.BookList;
-import com.example.seproject.data_classes.User;
-
-import java.util.List;
 
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Dialog fragment to delete a book list
+ */
 public class DeleteBookListDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
     private int deletedList;
-    private List<BookList> bookLists;
 
 
     @NonNull
@@ -29,8 +31,7 @@ public class DeleteBookListDialogFragment extends DialogFragment implements Dial
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 
-        bookLists = MainActivity.getOrderedBookLists();
-        String[] listDescriptors = bookLists.stream()
+        String[] listDescriptors = MainActivity.getOrderedBookLists().stream()
                 .map(BookList::getListShortInfo)
                 .toArray(String[]::new);
 
@@ -49,7 +50,7 @@ public class DeleteBookListDialogFragment extends DialogFragment implements Dial
             if (deletedList == -1)
                 Toast.makeText(getContext(), "Select list to delete", Toast.LENGTH_LONG).show();
             else {
-                MainActivity.getCurrentUser().deleteBookList(bookLists.get(deletedList).getListID(), deletedList);
+                MainActivity.getCurrentUser().deleteBookList(MainActivity.getOrderedBookLists().get(deletedList).getListID(), deletedList);
                 ((BookListsFragment)getParentFragment()).notifyAdapterItemRemoved(deletedList);
             }
         }

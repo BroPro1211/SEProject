@@ -1,21 +1,19 @@
 package com.example.seproject;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.ActivityResultRegistry;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -32,7 +30,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.seproject.data_classes.FBref;
-import com.example.seproject.data_classes.User;
 import com.example.seproject.registration.LogIn;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -43,16 +40,35 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Fragment displays the logged in user's profile
+ */
 public class ProfileFragment extends Fragment implements View.OnClickListener{
     private ImageView profileImage;
+    private ActivityResultLauncher<String> getCameraPermission;
     private ActivityResultLauncher<Intent> getImageFromCamera;
+    private ActivityResultLauncher<String> getStoragePermission;
     private ActivityResultLauncher<Intent> getImageFromGallery;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getCameraPermission = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+            @Override
+            public void onActivityResult(Boolean o) {
+                if (o) {
+                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    getImageFromCamera.launch(cameraIntent);
+                }
+                else {
+                    Toast.makeText(getContext(), "Please grant camera permission", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         getImageFromCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
             public void onActivityResult(ActivityResult result) {
@@ -69,6 +85,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
             }
         });
 
+        getStoragePermission = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+            @Override
+            public void onActivityResult(Boolean o) {
+                if (o) {
+                    Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    getImageFromGallery.launch(galleryIntent);
+                }
+                else {
+                    Toast.makeText(getContext(), "Please grant storage permission", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         getImageFromGallery = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
             public void onActivityResult(ActivityResult result) {
@@ -122,16 +150,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
                         int id = menuItem.getItemId();
 
                         if (id == R.id.changeImageCamera){
-                            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-
-                            getImageFromCamera.launch(cameraIntent);
+                            getCameraPermission.launch(Manifest.permission.CAMERA);
                         }
 
                         else{
-                            Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-                            getImageFromGallery.launch(galleryIntent);
-
+                            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+                                getStoragePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                            else
+                                getStoragePermission.launch(Manifest.permission.READ_MEDIA_IMAGES);
                         }
                         return true;
                     }
@@ -144,13 +170,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
         return view;
     }
 
-
+    /**
+     * Saves a new profile image
+     * @param image The bitmap of the new image
+     */
     private void saveNewImage(Bitmap image){
         MainActivity.getCurrentUser().setProfileImage(image);
         profileImage.setImageBitmap(image);
         uploadProfileImageToFB(image);
     }
 
+    /**
+     * Uploads a new profile image to firebase storage
+     * @param image The bitmap of the new image
+     */
     private void uploadProfileImageToFB(Bitmap image){
         String uid = MainActivity.getCurrentUser().getUid();
 

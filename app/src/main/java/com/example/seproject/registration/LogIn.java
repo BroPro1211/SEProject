@@ -2,15 +2,11 @@ package com.example.seproject.registration;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,10 +20,8 @@ import com.example.seproject.R;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.User;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.storage.StorageReference;
@@ -43,7 +37,6 @@ public class LogIn extends AppCompatActivity {
     private EditText emailET;
     private EditText passwordET;
     private Button logInButton;
-    private Button signUpButton;
     private ProgressBar progressBar;
 
 
@@ -53,6 +46,19 @@ public class LogIn extends AppCompatActivity {
         setContentView(R.layout.activity_log_in);
 
         initViews();
+
+
+    }
+    /**
+     * Initializes the activity views
+     */
+    private void initViews(){
+        emailET = findViewById(R.id.emailEditText);
+        passwordET = findViewById(R.id.passwordEditText);
+
+        logInButton = findViewById(R.id.logInButton);
+        Button signUpButton = findViewById(R.id.signUpButton);
+        progressBar = findViewById(R.id.progressBar);
 
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,15 +75,6 @@ public class LogIn extends AppCompatActivity {
                 startActivity(i);
             }
         });
-    }
-
-    private void initViews(){
-        emailET = findViewById(R.id.emailEditText);
-        passwordET = findViewById(R.id.passwordEditText);
-
-        logInButton = findViewById(R.id.logInButton);
-        signUpButton = findViewById(R.id.signUpButton);
-        progressBar = findViewById(R.id.progressBar);
     }
 
     /**
@@ -130,7 +127,7 @@ public class LogIn extends AppCompatActivity {
     }
 
     /**
-     * Gets the logged in user's data from the FB database
+     * Gets the logged in user's data from the FB database. If successful, opens the main activity.
      * @param context The context
      * @param activity The activity from which the method is called
      */
@@ -161,8 +158,7 @@ public class LogIn extends AppCompatActivity {
                     StorageReference userImageReference = FBref.FBUserImages.child(fileName);
                     Log.d("SEProject", "Downloading user profile image");
 
-                    final long ONE_MEGABYTE = 1024 * 1024;
-                    userImageReference.getBytes(ONE_MEGABYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+                    userImageReference.getBytes(FBref.MAX_IMAGE_BYTES).addOnCompleteListener(new OnCompleteListener<byte[]>() {
                         @Override
                         public void onComplete(@NonNull Task<byte[]> task) {
                             if (task.isSuccessful()){

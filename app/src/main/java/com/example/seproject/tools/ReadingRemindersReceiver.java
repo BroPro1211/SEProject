@@ -14,6 +14,9 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 /**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
  * Reading reminders broadcast receiver, that is called every day to check if a notification should be sent
  */
 public class ReadingRemindersReceiver extends BroadcastReceiver {

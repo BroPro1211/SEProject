@@ -11,7 +11,6 @@ import android.util.Log;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.registration.LogIn;
 import com.example.seproject.tools.ToolsFragment;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 

@@ -48,6 +48,22 @@ public class SignUp extends AppCompatActivity {
 
         initViews();
 
+
+    }
+    /**
+     * Initializes the activity views
+     */
+    private void initViews(){
+        emailET = findViewById(R.id.emailEditText);
+        usernameET = findViewById(R.id.usernameEditText);
+        passwordET = findViewById(R.id.passwordEditText);
+        verifyPasswordET = findViewById(R.id.verifyPasswordEditText);
+
+        backButton = findViewById(R.id.backButton);
+        signUpButton = findViewById(R.id.signUpButton);
+
+        progressBar = findViewById(R.id.progressBar);
+
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,20 +80,8 @@ public class SignUp extends AppCompatActivity {
         });
     }
 
-    private void initViews(){
-        emailET = findViewById(R.id.emailEditText);
-        usernameET = findViewById(R.id.usernameEditText);
-        passwordET = findViewById(R.id.passwordEditText);
-        verifyPasswordET = findViewById(R.id.verifyPasswordEditText);
-
-        backButton = findViewById(R.id.backButton);
-        signUpButton = findViewById(R.id.signUpButton);
-
-        progressBar = findViewById(R.id.progressBar);
-    }
-
     /**
-     * Gets user input and creates a new user for him
+     * Gets user input and creates a new user for him. If successful, opens the main activity.
      */
     private void signUp(){
         String email = emailET.getText().toString();
@@ -93,10 +97,6 @@ public class SignUp extends AppCompatActivity {
         }
         if (username.length() == 0){
             usernameET.setError("Enter username");
-            error = true;
-        }
-        if (username.length() >= 30){
-            usernameET.setError("Username length must be less than 30 characters");
             error = true;
         }
         if (password.length() < 6){

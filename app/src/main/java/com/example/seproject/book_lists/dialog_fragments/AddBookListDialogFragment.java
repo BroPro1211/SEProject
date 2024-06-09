@@ -16,8 +16,13 @@ import android.widget.Toast;
 import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.book_lists.BookListsFragment;
-import com.example.seproject.data_classes.User;
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Dialog fragment to add a book list
+ */
 public class AddBookListDialogFragment extends DialogFragment {
 
     @NonNull

@@ -21,11 +21,21 @@ import java.net.URL;
  * AsyncTask to load the image of a book from a url
  */
 public class LoadBookImageFromUrlTask extends AsyncTask<String, Void, Bitmap> {
+    /**
+     * Exception to throw when image download failed
+     */
     public static class FailedToLoadImageException extends RuntimeException{}
 
     private final Book book;
     private final Book.BookImageReceiver receiver;
     private final Context context;
+
+    /**
+     * Constructor for LoadBookImageFromUrlTask
+     * @param context The context
+     * @param book The book to download the image for
+     * @param receiver The image receiver
+     */
 
     public LoadBookImageFromUrlTask(Context context, Book book, Book.BookImageReceiver receiver) {
         this.context = context;

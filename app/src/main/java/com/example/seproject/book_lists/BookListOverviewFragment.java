@@ -3,6 +3,7 @@ package com.example.seproject.book_lists;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -19,11 +20,8 @@ import com.example.seproject.R;
 import com.example.seproject.book_lists.dialog_fragments.DeleteBookDialogFragment;
 import com.example.seproject.data_classes.Book;
 import com.example.seproject.data_classes.BookList;
-import com.example.seproject.data_classes.User;
 import com.example.seproject.book_lists.recycler_adapters.ListOfBooksRecyclerAdapter;
 import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,7 +31,7 @@ import java.util.List;
  * @since       04/06/2024
  * Fragment to display the contents of a book list
  */
-public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implements BookList.OrderedBooksReceiver {
+public class BookListOverviewFragment extends ListFragmentAddDelete implements BookList.OrderedBooksReceiver {
     public static final String ARG_LIST_ID = "listID";
 
     private String listID;
@@ -66,18 +64,6 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
 
         bookList = MainActivity.getCurrentUser().getBookLists().get(listID);
 
-        TextView listNameTV = view.findViewById(R.id.listNameTV);
-        listNameTV.setText(bookList.getName());
-
-        TextView listDescriptionTV = view.findViewById(R.id.listDescriptionTV);
-        String description = bookList.getDescription();
-        if (description.length() != 0)
-            listDescriptionTV.setText(bookList.getDescription());
-        else
-            listDescriptionTV.setVisibility(View.GONE);
-
-        view.findViewById(R.id.recyclerProgressBar).setVisibility(View.VISIBLE);
-
         initView(view);
 
         adapter = new ListOfBooksRecyclerAdapter(this, null);
@@ -93,8 +79,20 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
      * Initializes the fragment views
      * @param view The view of the fragment
      */
-    public void initView(View view){
+    private void initView(View view){
         initButtons(view);
+
+        TextView listNameTV = view.findViewById(R.id.listNameTV);
+        listNameTV.setText(bookList.getName());
+
+        TextView listDescriptionTV = view.findViewById(R.id.listDescriptionTV);
+        String description = bookList.getDescription();
+        if (description.length() != 0)
+            listDescriptionTV.setText(bookList.getDescription());
+        else
+            listDescriptionTV.setVisibility(View.GONE);
+
+        view.findViewById(R.id.recyclerProgressBar).setVisibility(View.VISIBLE);
 
         progressBar1 = view.findViewById(R.id.progressBar1);
         progressBar2 = view.findViewById(R.id.progressBar2);
@@ -106,7 +104,7 @@ public class BookListOverviewFragment extends ListFragmentAddDelete<Book> implem
     }
 
     @Override
-    public void getOrderedBooks(List<Book> books) {
+    public void getOrderedBooks(@NonNull List<Book> books) {
         MainActivity.setCurrentlyViewedListOfBooks(books);
 
         ListRecyclerAdapter.setAdapterToRecycler(adapter, recyclerView, getContext());

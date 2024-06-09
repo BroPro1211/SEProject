@@ -44,6 +44,7 @@ dependencies {
     implementation("com.google.firebase:firebase-database:21.0.0")
     implementation("com.google.firebase:firebase-storage:21.0.0")
     implementation("com.google.firebase:firebase-auth:23.0.0")
+    implementation(files("C:\\Users\\danie\\AppData\\Local\\Android\\Sdk\\platforms\\android-34\\android.jar"))
 
     val fragmentVersion = "1.7.1"
     implementation("androidx.fragment:fragment:$fragmentVersion")

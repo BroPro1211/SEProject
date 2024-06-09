@@ -1,5 +1,6 @@
 package com.example.seproject.tools;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,10 +13,7 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -41,13 +39,16 @@ import java.util.Calendar;
  */
 public class ToolsFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener{
     private SwitchCompat readingRemindersSwitch;
-    public static final String LAST_ACTIVE_TIME = "last active time";
-    public static final String READING_REMINDERS_ENABLED = "reading reminders enabled";
+
     public static final String SHARED_PREFERENCES_NAME = "shared preferences";
     private SharedPreferences sharedPreferences;
-    public final static int ALARM_REQUEST_CODE = 1;
+    public static final String LAST_ACTIVE_TIME = "last active time";
+    public static final String READING_REMINDERS_ENABLED = "reading reminders enabled";
+
     private AlarmManager alarmManager;
+    public final static int ALARM_REQUEST_CODE = 1;
     private PendingIntent pendingIntent;
+
     private ActivityResultLauncher<String> getNotificationPermission;
     private ActivityResultLauncher<Intent> getDoNoDisturbPermission;
 
@@ -132,7 +133,7 @@ public class ToolsFragment extends Fragment implements View.OnClickListener, Com
         if (isChecked){
             // starting from android version tiramisu, sending notifications requires permission from the user
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                getNotificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+                getNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
             else
                 enableReadingReminders();
         }

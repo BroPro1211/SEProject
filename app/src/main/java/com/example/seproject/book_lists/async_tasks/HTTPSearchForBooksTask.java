@@ -18,7 +18,7 @@ import java.net.URL;
  */
 public class HTTPSearchForBooksTask extends AsyncTask<String, Void, String> {
     /**
-     * Interface for the parent fragment to call a method with the results
+     * Interface for the results receiver to call a method with the results
      */
     public interface SearchResultsReceiver{
         /**
@@ -27,17 +27,21 @@ public class HTTPSearchForBooksTask extends AsyncTask<String, Void, String> {
          */
         void getSearchResults(String result);
     }
+
+    /**
+     * Exception to throw when failed to search for the book
+     */
     public static class FailedToSearchBooksException extends RuntimeException{}
 
-    private final SearchResultsReceiver parent;
+    private final SearchResultsReceiver receiver;
 
     /**
      * Constructor for HTTPSearchForBooksTask
-     * @param parent Search results receiver to call when done
+     * @param receiver Search results receiver to call when done
      */
-    public HTTPSearchForBooksTask(SearchResultsReceiver parent){
+    public HTTPSearchForBooksTask(SearchResultsReceiver receiver){
         super();
-        this.parent = parent;
+        this.receiver = receiver;
     }
 
     @Override
@@ -91,6 +95,6 @@ public class HTTPSearchForBooksTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
-        parent.getSearchResults(s);
+        receiver.getSearchResults(s);
     }
 }

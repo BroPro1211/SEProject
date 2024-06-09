@@ -1,24 +1,20 @@
 package com.example.seproject.data_classes;
 
-import android.content.Context;
+
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
-
-import androidx.appcompat.content.res.AppCompatResources;
-
+import androidx.annotation.NonNull;
 import com.example.seproject.MainActivity;
-import com.example.seproject.R;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Exclude;
-
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Class to store the information about a user
+ */
 public class User {
     private String uid;
     private String username;
@@ -26,6 +22,11 @@ public class User {
 
     private Bitmap profileImage;
 
+    /**
+     * Initializes the user instance
+     * @param uid The user's uid
+     * @param username The user's username
+     */
     public User(String uid, String username){
         if (uid == null || username == null || uid.length() == 0 || username.length() == 0)
             throw new IllegalArgumentException("Illegal user arguments " + uid + ", " + username);
@@ -65,7 +66,7 @@ public class User {
     }
 
     /**
-     * Deletes book list from usre
+     * Deletes book list from user
      * @param id Id of book list to delete
      * @param position Position of book list in the ordered list
      */
@@ -85,17 +86,19 @@ public class User {
 
     }
 
-
-
-
-
-
-
-
+    /**
+     * Returns the user's profile image
+     * @return The bitmap of the profile image, and null if doesn't exist
+     */
     @Exclude
     public Bitmap getProfileImage(){
         return profileImage;
     }
+
+    /**
+     * Sets the user's profile image
+     * @param image Bitmap of the profile image
+     */
     @Exclude
     public void setProfileImage(Bitmap image){
         profileImage = image;
@@ -104,14 +107,36 @@ public class User {
 
 
     // FB required constructor and getters
+
+    /**
+     * Empty constructor
+     */
     public User(){}
+
+    /**
+     * Returns the user uid
+     * @return User uid
+     */
     public String getUid(){
         return uid;
     }
+
+    /**
+     * Returns the user's username
+     * @return User's username
+     */
     public String getUsername(){
         return username;
     }
+
+    /**
+     * Returns the map of user's book lists. If empty, initializes it to an empty map.
+     * @return User's map of book lists
+     */
+    @NonNull
     public Map<String, BookList> getBookLists(){
+        if (bookLists == null)
+            bookLists = new LinkedHashMap<>();
         return bookLists;
     }
 

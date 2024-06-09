@@ -14,9 +14,13 @@ import android.widget.Toast;
 import com.example.seproject.MainActivity;
 import com.example.seproject.book_lists.BookListOverviewFragment;
 import com.example.seproject.data_classes.Book;
-import com.example.seproject.data_classes.User;
 
-
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Dialog fragment to delete a book
+ */
 public class DeleteBookDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
     public static final String ARG_LIST_ID = "listID";
 

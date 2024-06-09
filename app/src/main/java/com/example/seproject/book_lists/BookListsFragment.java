@@ -9,12 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.book_lists.dialog_fragments.AddBookListDialogFragment;
 import com.example.seproject.book_lists.dialog_fragments.DeleteBookListDialogFragment;
-import com.example.seproject.data_classes.BookList;
-import com.example.seproject.data_classes.User;
 import com.example.seproject.book_lists.recycler_adapters.BookListsRecyclerAdapter;
 import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
 
@@ -24,7 +21,7 @@ import com.example.seproject.book_lists.recycler_adapters.ListRecyclerAdapter;
  * @since       04/06/2024
  * The fragment that shows the book lists of the signed in user, and is the starting screen in the app
  */
-public class BookListsFragment extends ListFragmentAddDelete<BookList> {
+public class BookListsFragment extends ListFragmentAddDelete {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,7 +30,7 @@ public class BookListsFragment extends ListFragmentAddDelete<BookList> {
 
         initButtons(view);
 
-        adapter =  new BookListsRecyclerAdapter(MainActivity.getOrderedBookLists(), this);
+        adapter =  new BookListsRecyclerAdapter(this);
         recyclerView = view.findViewById(R.id.listRecyclerView);
 
         ListRecyclerAdapter.setAdapterToRecycler(adapter, recyclerView, getContext());

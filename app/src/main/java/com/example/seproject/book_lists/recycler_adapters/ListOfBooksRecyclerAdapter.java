@@ -1,6 +1,5 @@
 package com.example.seproject.book_lists.recycler_adapters;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,23 +16,36 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.seproject.MainActivity;
 import com.example.seproject.R;
-import com.example.seproject.data_classes.User;
 import com.example.seproject.data_classes.Book;
 import com.example.seproject.book_lists.BookDetailsFragment;
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Recycler adapter to display a list of books (the contents of a book list or the results of a search)
+ */
 public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksRecyclerAdapter.BookViewHolder, Fragment> {
 
-    // if adapter accessed from addBookFragment, field stores the listID a book should be added to
-    // else is null
+    /**
+     * if adapter accessed from addBookFragment, field stores the listID a book should be added to
+     * else is null
+     */
     private final String addBooksToListID;
 
+    /**
+     * View holder for a book
+     */
     public static class BookViewHolder extends ListRecyclerAdapter.ClickableViewHolder {
         private final TextView titleTV;
         private final TextView authorTV;
         private final ImageView imageView;
         private final ProgressBar progressBar;
 
-
+        /**
+         * Initializes the book view holder
+         * @param itemView The view holder's view
+         */
         public BookViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -43,6 +55,7 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
             progressBar = itemView.findViewById(R.id.progressBar);
         }
 
+        @Override
         public View.OnClickListener getOnClickListener() {
             return new View.OnClickListener() {
                 @Override
@@ -70,13 +83,31 @@ public class ListOfBooksRecyclerAdapter extends ListRecyclerAdapter<ListOfBooksR
             };
         }
 
+        /**
+         * Returns the title text view
+         * @return The titleTV
+         */
         public TextView getTitleTV() {
             return titleTV;
         }
+
+        /**
+         * Returns the author text view
+         * @return The authorTV
+         */
         public TextView getAuthorTV(){
             return authorTV;
         }
+        /**
+         * Returns the book image view
+         * @return The image view
+         */
         public ImageView getImageView() {return imageView;}
+
+        /**
+         * Returns the book image progress bar
+         * @return The progress bar
+         */
         public ProgressBar getProgressBar(){return progressBar;}
 
     }

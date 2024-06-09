@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -29,7 +30,6 @@ import com.example.seproject.data_classes.Book;
 import com.example.seproject.data_classes.BookList;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.Review;
-import com.example.seproject.data_classes.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -62,13 +62,14 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
     private TextView noReviewsTV;
     private TextView averageRatingTV;
     private TextView reviewsNumberTV;
-    private RecyclerView recyclerView;
+
     private int totalStars;
 
-    private DatabaseReference reviewsReference;
 
-
+    private RecyclerView recyclerView;
     private ReviewsRecyclerAdapter adapter;
+
+    private DatabaseReference reviewsReference;
     private ChildEventListener reviewsListener;
 
     @Override
@@ -111,8 +112,7 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
                     StorageReference bookImageReference = FBref.FBUserImages.child(fileName);
                     Log.d("SEProject", "Downloading user profile image");
 
-                    final long ONE_MEGABYTE = 1024 * 1024;
-                    bookImageReference.getBytes(ONE_MEGABYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+                    bookImageReference.getBytes(FBref.MAX_IMAGE_BYTES).addOnCompleteListener(new OnCompleteListener<byte[]>() {
                         @Override
                         public void onComplete(@NonNull Task<byte[]> task) {
                             int pos = book.findReviewUid(review.getUid());
@@ -273,8 +273,7 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
             progressBarFAB.setVisibility(View.VISIBLE);
             bookDetailsFAB.setVisibility(View.INVISIBLE);
 
-            bookList.setBookToAdd(book);
-            bookList.addBook(this, alreadyInFB);
+            bookList.addBook(book, this, alreadyInFB);
 
         }
         else{
@@ -285,6 +284,13 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
         }
 
 
+    }
+
+    /**
+     * Method to call when finished adding the book to the book list
+     */
+    public void onAddedBook(){
+        getParentFragmentManager().popBackStack(BookListOverviewFragment.ADD_BOOK_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     /**
@@ -350,6 +356,8 @@ public class BookDetailsFragment extends Fragment implements View.OnClickListene
 
         getParentFragmentManager().popBackStack();
     }
+
+
 
     /**
      * Method initializes the reviews display

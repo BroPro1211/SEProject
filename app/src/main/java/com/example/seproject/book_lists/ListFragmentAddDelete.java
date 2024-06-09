@@ -18,7 +18,7 @@ import com.example.seproject.R;
  * @since       04/06/2024
  * An abstract class of a fragment that displays a recycle view with add and delete buttons
  */
-public abstract class ListFragmentAddDelete<T> extends Fragment {
+public abstract class ListFragmentAddDelete extends Fragment {
 
     protected RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter;
     protected RecyclerView recyclerView;

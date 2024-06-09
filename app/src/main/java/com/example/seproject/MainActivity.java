@@ -111,12 +111,25 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         }
     }
 
+    /**
+     * Sets the currently logged in user
+     * @param user User instance of the logged in user.
+     */
     public static void setCurrentUser(User user){
         loggedInUser = user;
     }
+
+    /**
+     * Returns the user instance of the logged in user
+     * @return The logged in user
+     */
     public static User getCurrentUser(){
         return loggedInUser;
     }
+
+    /**
+     * Checks if there is a currently logged in user. If not, an exception is thrown.
+     */
     public static void checkCurrentUser(){
         if (loggedInUser == null)
             throw new RuntimeException("No logged in user found");
@@ -135,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     /**
      * Returns the book lists of the signed in user, ordered by their creation time
-     * @return The list of ordered book lists
+     * @return The list of book lists
      */
     @NonNull
     public static List<BookList> getOrderedBookLists(){
@@ -153,16 +166,30 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         return orderedBookLists;
     }
 
-
+    /**
+     * Sets the current list of books being displayed
+     * @param listOfBooks The list of books being displayed
+     */
     public static void setCurrentlyViewedListOfBooks(List<Book> listOfBooks){
         currentlyViewedListOfBooks = listOfBooks;
     }
+
+    /**
+     * Returns the current list of books being displayed
+     * @return The list of books being displayed
+     */
     @NonNull
     public static List<Book> getCurrentlyViewedListOfBooks(){
         if (currentlyViewedListOfBooks == null)
             currentlyViewedListOfBooks = new ArrayList<>();
         return currentlyViewedListOfBooks;
     }
+
+    /**
+     * Finds the index of the book with the given id in the current list of books being displayed
+     * @param bookID The id of the book to search for
+     * @return Returns the index of the book in the list if found, and -1 if not found
+     */
     public static int findBookInCurrentlyViewed(String bookID){
         for (int i = 0; i < getCurrentlyViewedListOfBooks().size(); i++){
             if (getCurrentlyViewedListOfBooks().get(i).getBookID().equals(bookID)){
@@ -172,13 +199,24 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         return -1;
     }
 
-
+    /**
+     * Shortens the string to the given length
+     * @param s The string to shorten
+     * @param length The length to shorten to
+     * @return Returns s if s is shorter than the length, and else returns s shortened to the given length
+     */
     public static String shortenString(String s, int length){
         if (s.length() <= length)
             return s;
         return s.substring(0, length) + "...";
     }
 
+    /**
+     * Returns a bitmap of the given drawable resource
+     * @param context The context
+     * @param drawableId The id of the drawable
+     * @return Returns a bitmap of the drawable
+     */
     public static Bitmap getBitmapFromDrawable(Context context, int drawableId){
         Drawable drawable = AppCompatResources.getDrawable(context, drawableId);
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);

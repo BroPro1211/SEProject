@@ -2,8 +2,6 @@ package com.example.seproject.book_lists.recycler_adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,22 +18,26 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.book_lists.BookDetailsFragment;
-import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.Review;
-import com.example.seproject.data_classes.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.StorageReference;
 
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Recycler adapter to display a book's reviews
+ */
 public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerAdapter.ReviewViewHolder, BookDetailsFragment> {
 
     private final List<Review> reviews;
 
+    /**
+     * View holder for a review
+     */
     public static class ReviewViewHolder extends RecyclerView.ViewHolder{
         private final TextView reviewUsernameTV;
         private final RatingBar reviewStarsRatingBar;
@@ -49,7 +51,10 @@ public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerA
         private final TextView likesNumberTV;
 
 
-
+        /**
+         * Initializes the review view holder
+         * @param itemView The view holder's view
+         */
         public ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -84,25 +89,62 @@ public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerA
             });
         }
 
+        /**
+         * Returns the username text view
+         * @return The reviewUsernameTV
+         */
         public TextView getReviewUsernameTV() {
             return reviewUsernameTV;
         }
-
+        /**
+         * Returns the review stars rating bar
+         * @return The reviewStarsRatingBar
+         */
         public RatingBar getReviewStarsRatingBar() {
             return reviewStarsRatingBar;
         }
-
+        /**
+         * Returns the review date text view
+         * @return The reviewDateTV
+         */
         public TextView getReviewDateTV() {
             return reviewDateTV;
         }
-
+        /**
+         * Returns the review description text view
+         * @return The reviewDescriptionV
+         */
         public TextView getReviewDescriptionV() {
             return reviewDescriptionV;
         }
-
+        /**
+         * Returns the delete review button
+         * @return The deleteReviewButton
+         */
         public ImageButton getDeleteReviewButton() {
             return deleteReviewButton;
         }
+
+        /**
+         * Returns the like image view
+         * @return The likeImageView
+         */
+        public ImageView getLikeImageView(){
+            return likeImageView;
+        }
+        /**
+         * Returns the likes number text view
+         * @return The likesNumberTV
+         */
+        public TextView getLikesNumberTV(){
+            return likesNumberTV;
+        }
+
+        /**
+         * Displays the user's profile image. If user doesn't have profile image, shows the default profile image.
+         * @param context The context
+         * @param image The profile image
+         */
         public void showProfileImage(Context context, Bitmap image) {
             imageProgressBar.setVisibility(View.GONE);
             imageCardView.setVisibility(View.VISIBLE);
@@ -113,21 +155,23 @@ public class ReviewsRecyclerAdapter extends ListRecyclerAdapter<ReviewsRecyclerA
                 profileImageView.setImageBitmap(MainActivity.getBitmapFromDrawable(context, R.drawable.baseline_person_gray_100));
 
         }
+        /**
+         * Hides the profile image and shows the progress bar
+         */
         public void hideProfileImage(){
             imageProgressBar.setVisibility(View.VISIBLE);
             imageCardView.setVisibility(View.INVISIBLE);
         }
 
-        public ImageView getLikeImageView(){
-            return likeImageView;
-        }
-        public TextView getLikesNumberTV(){
-            return likesNumberTV;
-        }
+
 
     }
 
-
+    /**
+     * Constructor for the adapter
+     * @param fragment The fragment displaying this book
+     * @param reviews The list of reviews
+     */
     public ReviewsRecyclerAdapter(BookDetailsFragment fragment, List<Review> reviews) {
         super(fragment);
         this.reviews = reviews;

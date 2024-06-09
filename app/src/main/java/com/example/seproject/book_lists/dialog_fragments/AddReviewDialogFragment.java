@@ -18,20 +18,25 @@ import com.example.seproject.MainActivity;
 import com.example.seproject.R;
 import com.example.seproject.data_classes.FBref;
 import com.example.seproject.data_classes.Review;
-import com.example.seproject.data_classes.User;
 
 
+/**
+ * @author		Daniel Bronfenbrener
+ * @version     1.0
+ * @since       04/06/2024
+ * Dialog fragment to add a review
+ */
 public class AddReviewDialogFragment extends DialogFragment {
 
     public static final String ARG_BOOK_ID = "bookID";
 
     private String bookID;
 
-    public AddReviewDialogFragment() {
-        // Required empty public constructor
-    }
-
-
+    /**
+     * Creates a new instance of AddReviewDialogFragment, passing the bookID of the book
+     * @param bookID The book to add the review to
+     * @return The new instance of AddReviewDialogFragment
+     */
     public static AddReviewDialogFragment newInstance(String bookID) {
         AddReviewDialogFragment fragment = new AddReviewDialogFragment();
         Bundle args = new Bundle();

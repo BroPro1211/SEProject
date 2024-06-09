@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.seproject.MainActivity;
@@ -16,8 +15,6 @@ import com.example.seproject.R;
 import com.example.seproject.book_lists.BookListsFragment;
 import com.example.seproject.data_classes.BookList;
 import com.example.seproject.book_lists.BookListOverviewFragment;
-
-import java.util.List;
 
 /**
  * @author		Daniel Bronfenbrener
@@ -27,12 +24,18 @@ import java.util.List;
  */
 public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyclerAdapter.BookListViewHolder, BookListsFragment> {
 
-    private final List<BookList> data;
 
+    /**
+     * View holder for each book list
+     */
     public static class BookListViewHolder extends ListRecyclerAdapter.ClickableViewHolder {
         private final TextView nameTV;
         private final TextView listSizeTV;
 
+        /**
+         * Initializes the book list view holder
+         * @param itemView The view holder's view
+         */
         public BookListViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -40,6 +43,7 @@ public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyc
             listSizeTV = itemView.findViewById(R.id.listSizeTV);
         }
 
+        @Override
         public View.OnClickListener getOnClickListener(){
             return new View.OnClickListener() {
                 @Override
@@ -47,7 +51,7 @@ public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyc
                     BookListsRecyclerAdapter adapter = (BookListsRecyclerAdapter)getBindingAdapter();
 
                     int position = getAbsoluteAdapterPosition();
-                    String listID = adapter.data.get(position).getListID();
+                    String listID = MainActivity.getOrderedBookLists().get(position).getListID();
                     Bundle args = new Bundle();
                     args.putString(BookListOverviewFragment.ARG_LIST_ID, listID);
 
@@ -82,13 +86,10 @@ public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyc
 
     /**
      * Constructor for BookListsRecyclerAdapter
-     * @param bookLists The list of book lists to display
-     * @param parentFragment The
+     * @param parentFragment The fragment
      */
-    public BookListsRecyclerAdapter(List<BookList> bookLists, BookListsFragment parentFragment){
+    public BookListsRecyclerAdapter(BookListsFragment parentFragment){
         super(parentFragment);
-
-        data = bookLists;
     }
 
     @NonNull
@@ -101,7 +102,7 @@ public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyc
 
     @Override
     public void onBindViewHolder(@NonNull BookListViewHolder holder, int position) {
-        BookList bookList = data.get(position);
+        BookList bookList = MainActivity.getOrderedBookLists().get(position);
 
         holder.getNameTV().setText(bookList.getName());
         holder.getListSizeTV().setText(bookList.getBookCount() + " books");
@@ -110,6 +111,6 @@ public class BookListsRecyclerAdapter extends ListRecyclerAdapter<BookListsRecyc
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return MainActivity.getOrderedBookLists().size();
     }
 }
